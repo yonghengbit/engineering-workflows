@@ -91,8 +91,9 @@ $engineering-workflow
 实现一个新的 KV Cache backend。
 ```
 
-在 Codex CLI 或 IDE extension 中也可以通过 `/skills` 查找 skill。安装后，Codex 还可能
-根据 description 隐式匹配；显式调用更适合需要确保使用本框架的任务。
+在 Codex CLI 或 IDE extension 中也可以通过 `/skills` 查找 skill。当前版本默认关闭隐式
+调用，避免普通低风险任务自动承担 workflow body 的上下文成本。需要混合目标、严格证据链
+或团队一致流程时，显式使用 `$engineering-workflow`。
 
 通常不需要告诉它：
 
@@ -168,8 +169,8 @@ Development 根据 Scope、Uncertainty、Risk 和 Parallelism 判断规模。用
 | Scale | 典型情况 | 默认 artifact |
 |---|---|---|
 | SMALL | 局部、明确、低风险、验证直接 | 无 |
-| MEDIUM | 同一模块内有多个步骤，需要简洁执行计划 | `PLAN.md`, `HANDOFF.md` |
-| LARGE | 跨模块契约、架构选择、高风险或兼容性敏感 | `DESIGN.md`, `PLAN.md`, `HANDOFF.md` |
+| MEDIUM | 同一模块内有多个步骤 | 需要持久 checkpoint 时写 `PLAN.md`；真正交接时写 `HANDOFF.md` |
+| LARGE | 跨模块契约、架构选择、高风险或兼容性敏感 | 有设计决定或多阶段协调时写对应 artifact；真正交接时写 `HANDOFF.md` |
 | VERY_LARGE | 多 subsystem、多个独立 phase 或一个 plan 已无法表达 | `DESIGN.md`, `ROADMAP.md`, `plans/*`, `handoffs/*` |
 
 规模不是按代码行数、文件数或耗时判断。几十行 scheduling 语义变更也可能是 LARGE；多个
@@ -352,15 +353,39 @@ SKILL.md
 -> references/development/small.md
 ```
 
-不会加载 Debugging、Performance 或其他 Development 档位。当前保守估算约 2.2k tokens；
-QUICK Testing 约 2.0k tokens。实际 token 数受 tokenizer 影响，这些数字只是防止文件增长的
+不会加载 Debugging、Performance 或其他 Development 档位。当前字符代理估算约 1.9k tokens；
+QUICK Testing 也约 1.9k tokens。实际 token 数受 tokenizer 影响，这些数字只是防止文件增长的
 工程预算。
 
-这部分成本换来稳定的 routing、验证和避免过度流程。对于普通非工程对话，skill 不应匹配，
-通常只承担很短的 metadata 成本。对于工程任务，它确实比完全无方法提示多用一些 token，
-但 SMALL、QUICK、DIRECT 路径不会创建文档或默认使用 subagent。
+因为默认关闭隐式调用，普通工程任务也不会自动加载 skill body；安装后的 metadata 仍可能
+出现在 skill 列表中。显式调用确实比直接 Codex 多用一些 token，但 SMALL、QUICK、DIRECT
+路径不会创建无价值文档或默认使用 subagent。
 
-如果极度在意一次性小任务的 token，可以不显式调用；让 Codex 根据 description 判断是否
-需要该 skill。需要稳定执行本框架时再使用 `$engineering-workflow`。
+如果极度在意一次性小任务的 token，可以不显式调用，直接使用原生 Codex；需要稳定执行本
+框架时再使用 `$engineering-workflow`。
 
-仓库测试会限制常见路径和各 intent reference 的字符预算，避免后续维护中重新膨胀。
+仓库测试会限制常见路径、混合链路和各 intent reference 的字符预算，避免后续维护中重新
+膨胀。
+
+## 14. 当前测试数据怎样理解
+
+`tests/evals/` 保存了同一继承 Codex 配置、medium reasoning 的 paired forward tests：baseline
+不加载 skill body，treatment 显式加载本 skill。当前 host 未暴露可核验的公开 model slug，
+因此结果不冒充特定模型数据。确定性 rubric 包含 48 个 routing、授权、证据、artifact、
+transition 和 subagent 检查点。
+
+```text
+frozen holdout baseline   35 / 48 = 72.9%
+frozen holdout treatment  43 / 48 = 89.6%
+gain                        8 checks = +16.7 percentage points
+```
+
+holdout prompts 在最终 rubric 冻结后才交给两个新 agent，评分后 rubric SHA-256 保持不变。
+增益主要来自并发根因证明、Debugging -> Development -> Testing 顺序、受控性能证据和条件
+修复链。另一个探索性样本为 47/48 -> 48/48，但 scorer 曾在看到输出后修正，因此不作为主要
+宣传数据。
+
+holdout 仍只有 8 个案例、不执行真实代码，而且 regex scorer 对同义表达敏感。因此它只能说明
+本 skill 在这组 prompts 上改善了 routing 和 evidence discipline，不能宣传为“编码成功率提高
+16.7%”。它也不证明成本、延迟或其他模型上的收益。原始 JSONL、冻结协议、rubric 和 scorer
+全部保留，可复查和扩展。

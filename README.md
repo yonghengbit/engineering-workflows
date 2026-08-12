@@ -1,7 +1,7 @@
 # Engineering Workflows for Codex
 
-A single Codex skill that routes an engineering goal to the right method and applies only as much
-process as the task needs.
+A single opt-in Codex skill for mixed, high-risk, and evidence-sensitive engineering work. It routes
+the current result to the right method and applies only as much process as the task needs.
 
 ```text
 User goal + repository constraints
@@ -18,7 +18,17 @@ Users normally describe the outcome they want; they do not need to choose a work
 or number of agents.
 
 The skill uses progressive loading and tested context budgets: it loads one intent workflow and, when
-needed, one scale/strategy reference—not the whole library.
+needed, one scale/strategy reference—not the whole library. Routine low-risk work can use native
+Codex directly and pays no selected-skill body cost.
+
+## Why Use It
+
+- prove an unknown cause before repairing it;
+- keep implementation verification inside Development instead of multiplying workflows;
+- never count unavailable validation as PASS;
+- require controlled, repeated evidence before performance claims;
+- keep review read-only unless fixes are explicitly requested;
+- avoid plans, handoffs, and subagents when they do not improve reliability.
 
 ## One-minute Installation
 
@@ -50,6 +60,17 @@ LMCache 的 REGISTER_KV_CACHE 在 DCU 环境报 HIP error，
 
 The framework starts with Debugging, transitions to Development after root-cause proof, then uses
 Testing for regression verification.
+
+The skill is explicit-invocation by default. This avoids broad automatic activation on routine edits
+and makes its context cost a user choice.
+
+## Measured Scope
+
+On a frozen eight-case holdout, the same inherited Codex configuration scored 35/48 (72.9%) without
+the skill body and 43/48 (89.6%) with it: eight additional routing and evidence-discipline checks.
+This is not a claim of general coding superiority. See `tests/evals/` for the frozen rubric hash, raw
+JSONL, scorer, exploratory run, and limitations; the host did not expose a verifiable public model
+slug.
 
 ## Layout
 

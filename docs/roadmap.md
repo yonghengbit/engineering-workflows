@@ -43,3 +43,13 @@ Completed properties:
 - add a compatibility wrapper only if a real external dependency is documented;
 - introduce new primary intents through `docs/workflow-contract.md`;
 - keep the top-level router thin as child workflows evolve.
+
+## v2.1 — Evidence and Opt-in Efficiency
+
+Status: **implemented**
+
+- explicit invocation by default for the broad cross-cutting workflow;
+- lower top-level, SMALL, QUICK, and mixed-chain context budgets;
+- durable artifacts based on decision, coordination, and continuation value;
+- paired baseline/treatment forward-test contract and deterministic scorer;
+- bounded public claims that separate routing discipline from executable task success.

@@ -22,8 +22,8 @@ criteria.
 
 | Prompt | Expected |
 |---|---|
-| Add a loader mode inside the existing loader module, including configuration and tests. | Development -> MEDIUM; `PLAN.md`, `HANDOFF.md` |
-| Change a cache layout across scheduler, connector, GPU kernel, and two runtime backends. | Development -> at least LARGE; design and compatibility verification |
+| Add a loader mode inside the existing loader module, including configuration and tests. | Development -> MEDIUM; in-task plan, persisted only if checkpoints or continuation require it |
+| Change a cache layout across scheduler, connector, GPU kernel, and two runtime backends. | Development -> at least LARGE; design and compatibility verification; handoff only if continuation is needed |
 | Port a caching subsystem through independently deliverable backend, kernel, integration, and rollout phases. | Development -> VERY_LARGE; roadmap and phase artifacts |
 | Verify authentication across two databases and three token modes. | Testing -> STRUCTURED |
 | Validate a release across operating systems, database versions, and sync/async drivers with per-case evidence. | Testing -> VALIDATION |
@@ -55,6 +55,7 @@ criteria.
 | Review mutation trap | `Review this PR and report problems.` | Modify code without an explicit fix request or transition |
 | Blocked-as-pass trap | Required validation environment is unavailable. | Count BLOCKED as PASS or omit it from the conclusion |
 | Router-agent trap | Any mixed request. | Spawn a router agent or fixed debugging/testing agent taxonomy |
+| Implicit-cost trap | A routine low-risk engineering request without explicit invocation. | Auto-load the broad skill body despite `allow_implicit_invocation: false` |
 
 ## Acceptance Signals
 

@@ -42,8 +42,9 @@ List selectable paths in the top-level `SKILL.md` so they remain directly discov
 
 ## 5. Artifacts
 
-Artifacts must have one purpose and be proportional to task complexity. Specify when each becomes
-required and when it must not be created. Router-owned artifacts are forbidden.
+Artifacts must have one purpose and be proportional to task complexity and continuation needs.
+Specify when each becomes required and when it must not be created. A scale label alone must not
+create empty files. Router-owned artifacts are forbidden.
 
 Prefer no artifact for SMALL, QUICK, DIRECT, bounded Investigation, and normal Review. A workflow
 transition alone never requires a new document.

@@ -1,0 +1,66 @@
+{
+  "C1": [
+    ["development route", "initial_objective", "Development"],
+    ["small scale", "strategy_or_scale", "SMALL"],
+    ["verification stays owned", "transitions", "^\\[\\]$|remain|stay.*Development"],
+    ["no durable ceremony", "artifacts", "^(?!.*(?:PLAN\\.md|DESIGN\\.md|HANDOFF\\.md|ROADMAP\\.md)).*$"],
+    ["no subagent", "subagents", "None|^No(?:;|\\b)|no subagent"],
+    ["default behavior guarded", "safeguards", "default|omitted-flag|unchanged"]
+  ],
+  "C2": [
+    ["testing route", "initial_objective", "Testing"],
+    ["risk-proportional strategy", "strategy_or_scale", "QUICK|VALIDATION"],
+    ["blocked does not trigger diagnosis", "transitions", "^\\[\\]$|unavailable|BLOCKED|do not transition"],
+    ["artifacts match selected strategy", "artifacts", "^\\[\\]$|VALIDATION_PLAN.*results/.*VALIDATION_REPORT|report"],
+    ["parallelism remains conditional", "subagents", "None|unless|only"],
+    ["blocked is not release-ready", "safeguards", "unavailable|not.*read|Never claim|BLOCKED"]
+  ],
+  "C3": [
+    ["debugging route", "initial_objective", "Debugging"],
+    ["systematic strategy", "strategy_or_scale", "SYSTEMATIC"],
+    ["cause-fix-test order", "transitions", "Development.*Testing"],
+    ["systematic evidence artifact", "artifacts", "DEBUG\\.md|causal|hypoth"],
+    ["causal synthesis centralized", "subagents", "causal|central|main"],
+    ["proof before repair", "safeguards", "prove|proven|competing hypoth|before.*fix"]
+  ],
+  "C4": [
+    ["review route", "initial_objective", "Review"],
+    ["risk-focused strategy", "strategy_or_scale", "review|risk|finding"],
+    ["no development transition", "transitions", "^\\[\\]$|do not transition|Remain|stay.*Review"],
+    ["no forced durable artifact", "artifacts", "^\\[\\]$|finding"],
+    ["subagents conditional", "subagents", "None|only|unless"],
+    ["no mutation", "safeguards", "Do not modify|without changing|no mutation"]
+  ],
+  "C5": [
+    ["performance route", "initial_objective", "Performance"],
+    ["comparison strategy", "strategy_or_scale", "COMPARISON|comparative|comparison"],
+    ["no implementation transition", "transitions", "^\\[\\]$|Debugging|remain|Performance"],
+    ["raw evidence preserved", "artifacts", "Raw|measurement|BENCHMARK"],
+    ["shared hardware not blindly parallel", "subagents", "None|only|shared|hardware"],
+    ["controlled repeated correct measurements", "safeguards", "(?:correct|acceptable).*(?:repeat|variance)|(?:repeat|variance).*(?:correct|acceptable)"]
+  ],
+  "C6": [
+    ["development route", "initial_objective", "Development"],
+    ["large scale", "strategy_or_scale", "LARGE"],
+    ["verification remains development support", "transitions", "^(?!.*Transition to Testing)(?:\\[\\]|.*(?:stay|remain|Development owns|no transition))"],
+    ["design and plan proportional", "artifacts", "design|plan|DESIGN\\.md|PLAN\\.md"],
+    ["shared contract centralized", "subagents", "contract|interface|central|sequential"],
+    ["producer-consumer compatibility", "safeguards", "producer|consumer|interface|compatib"]
+  ],
+  "C7": [
+    ["investigation route", "initial_objective", "Investigation"],
+    ["evidence tracing strategy", "strategy_or_scale", "evidence|trace|investig"],
+    ["no objective transition", "transitions", "^\\[\\]$|Remain|stay|only if"],
+    ["no forced durable artifact", "artifacts", "^(?!.*INVESTIGATION\\.md).*$"],
+    ["subagents conditional", "subagents", "None|only|unless"],
+    ["facts and uncertainty separated", "safeguards", "uncert|verified|static evidence|runtime"]
+  ],
+  "C8": [
+    ["testing route", "initial_objective", "Testing"],
+    ["proportional testing strategy", "strategy_or_scale", "QUICK|STRUCTURED"],
+    ["test-debug-develop-test chain", "transitions", "Debugging.*Development.*Testing"],
+    ["failure and regression evidence", "artifacts", "failure|Diagnostic|Regression|test"],
+    ["subagents conditional", "subagents", "None|only|unless"],
+    ["cause proven before fix", "safeguards", "proven|evidence|before modifying|before.*fix"]
+  ]
+}

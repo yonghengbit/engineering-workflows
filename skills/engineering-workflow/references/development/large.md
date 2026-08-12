@@ -1,73 +1,41 @@
 # Large Development
 
-Use for cross-module, high-risk, architecture-sensitive, or compatibility-sensitive development.
+Use for cross-module, architecture-sensitive, high-risk, or compatibility-sensitive changes.
 
 ## Artifacts
 
-Maintain:
-
-```text
-DESIGN.md
-PLAN.md
-HANDOFF.md
-```
-
-## DESIGN.md
-
-Capture why the solution is designed this way:
+Maintain `DESIGN.md` when the task contains a material design or compatibility decision. Maintain
+`PLAN.md` when execution has multiple dependent phases or needs reviewable checkpoints. Maintain
+`HANDOFF.md` only for continuation across tasks, sessions, or agents. A LARGE label alone does not
+justify empty files.
 
 ```markdown
 # Design
-
-## Problem
-## Current Architecture
-## Constraints
-## Proposed Design
-## Alternatives Considered
-## Decision
-## Compatibility
-## Risks
+## Problem and Current Architecture
+## Constraints and Boundaries
+## Alternatives and Decision
+## Compatibility and Risks
 ## Verification Strategy
 ```
 
-Cover critical call paths, producer/consumer boundaries, compatibility, data/layout, performance,
-platform constraints, and meaningful alternatives. Do not use `DESIGN.md` as an execution log.
-
-## PLAN.md
-
-Create an execution plan from the accepted design:
-
 ```markdown
 # Task
-
-## Goal
-## Design Reference
-See `DESIGN.md`.
-## Plan
-- [ ] Phase 1: ...
-- [ ] Phase 2: ...
+## Goal and Design Reference
+## Phases and Dependencies
 ## Verification
 ```
 
-Do not reopen architecture choices unless new evidence invalidates the design.
-
 ## Workflow
 
-1. Trace current architecture and compatibility boundaries.
-2. Create or update `DESIGN.md` and compare plausible approaches.
-3. Record the decision and create or update `PLAN.md`.
-4. Perform the post-design/plan re-evaluation in `development/workflow.md`.
-5. Implement coherent phases with local verification.
-6. Re-evaluate lightly at phase boundaries.
-7. Run overall correctness, compatibility, and relevant performance checks.
-8. Inspect the complete diff and update `HANDOFF.md`.
+1. Trace architecture, producer/consumer contracts, and compatibility boundaries.
+2. Compare plausible approaches and persist the decision when it must survive the current context.
+3. Plan coherent phases and re-evaluate scale.
+4. Implement dependent contract work sequentially; verify each meaningful phase.
+5. Run overall correctness, compatibility, and relevant performance checks.
+6. Inspect the complete diff and preserve continuation state only when needed.
 
-Keep one coherent set of architectural assumptions. Label temporary workarounds, define compatibility
-paths and their intended lifetime, preserve performance baselines when relevant, and record untested
-environments or backends.
+Label temporary compatibility paths and their intended lifetime. Record untested environments or
+backends. Use subagents only for real independent workstreams; LARGE alone is not a reason.
 
-Use subagents only for actual independent workstreams; LARGE alone is not a reason.
-
-Reclassify to VERY_LARGE when the task becomes several independently deliverable phases, spans
-multiple repositories or major subsystems, includes migration or rollout as a major workstream, or a
-single `PLAN.md` no longer represents it clearly.
+Reclassify to VERY_LARGE when several independently deliverable subsystems, repositories, migration
+or rollout phases need separate plans and one roadmap must coordinate them.

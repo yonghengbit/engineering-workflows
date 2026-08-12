@@ -1,105 +1,79 @@
 ---
 name: engineering-workflow
-description: Route software engineering tasks to Development, Testing, Debugging, Performance, Investigation, or Review, then apply only the selected workflow and necessary process depth. Use for implementation, validation, diagnosis, benchmarking, code understanding, change review, and mixed engineering tasks that may transition between those objectives.
+description: Coordinate mixed, high-risk, or evidence-sensitive software engineering work across Development, Testing, Debugging, Performance, Investigation, and Review. Use explicitly when a task needs reliable routing, proportional process, or controlled transitions between objectives; use native Codex directly for routine low-risk work.
 ---
 
 # Engineering Workflow
 
-Use one lightweight routing policy, then let one workflow own execution until the primary objective
-changes. The router is policy for the current main agent—not an agent, executor, artifact owner, or
-multi-agent orchestrator.
+Route the current deliverable once, then let one workflow own execution until the requested result
+changes. Treat this router as policy for the current agent, not as an executor or orchestrator.
 
-## 1. Apply Repository Constraints
+## Apply Repository Constraints
 
 Follow applicable `AGENTS.md` and `AGENTS.override.md`. Inspect repository and git state when relevant.
-Repository rules constrain execution; they do not determine task type.
+Repository rules constrain every route but do not select it.
 
-## 2. Route the Current Deliverable
+## Route by Requested Result
 
-Choose the result the user wants now, using repository context rather than keywords:
-
-| Intent | Owning question | Load |
+| Intent | Current result | Load |
 |---|---|---|
-| Debugging | What causes this unexpected behavior? | `references/debugging/workflow.md` |
-| Performance | How fast is it, why, and under what conditions? | `references/performance/workflow.md` |
-| Investigation | How does the existing system work? | `references/investigation/workflow.md` |
-| Review | What risks exist in this change or design? | `references/review/workflow.md` |
-| Testing | Does behavior satisfy explicit criteria? | `references/testing/workflow.md` |
-| Development | What behavior should be intentionally changed? | `references/development/workflow.md` |
+| Debugging | Prove what causes unexpected behavior | `references/debugging/workflow.md` |
+| Performance | Produce a controlled performance conclusion | `references/performance/workflow.md` |
+| Investigation | Explain how the existing system works | `references/investigation/workflow.md` |
+| Review | Identify risks in an existing change or design | `references/review/workflow.md` |
+| Testing | Decide whether explicit criteria pass | `references/testing/workflow.md` |
+| Development | Intentionally change software behavior | `references/development/workflow.md` |
 
-For genuinely mixed wording, prefer: unknown failure -> Debugging; performance question ->
-Performance; understanding -> Investigation; evaluation of an existing change -> Review; explicit
-pass/fail -> Testing; intentional change -> Development. This precedence is a tie-breaker, not keyword
-matching. “Implement and add tests” starts as Development; “run tests and report” starts as Testing.
+For mixed wording, use the earliest unresolved result: unknown failure before repair, measurement
+before optimization, understanding before a requested change, review before selected fixes, explicit
+pass/fail before conditional diagnosis, otherwise intentional change. This is an outcome rule, not
+keyword matching. “Implement and add tests” starts as Development; “run tests and report” starts as
+Testing.
 
-## 3. Load Progressively
+## Load Progressively
 
-1. Load exactly one workflow file from the table.
-2. Stop routing while it owns the task.
-3. Let it choose strategy, artifacts, verification, and execution shape.
-4. Only then load one selected strategy reference when applicable:
+1. Load exactly one workflow from the table and stop routing.
+2. Let that workflow choose process, evidence, artifacts, and execution shape.
+3. Load at most one selected strategy reference when required:
    - Development: `references/development/small.md`, `references/development/medium.md`,
      `references/development/large.md`, or `references/development/very-large.md`;
    - Testing: `references/testing/quick.md`, `references/testing/structured.md`, or
      `references/testing/validation.md`.
-5. Load a destination workflow only after a real objective transition.
+4. Load another workflow only after a real objective transition.
 
-Never preload all workflows or strategies.
+Never preload alternatives.
 
-## 4. Sequence Mixed Tasks
+## Preserve Ownership
 
-```text
-unknown crash; fix and verify
-Debugging -> Development -> Testing
-
-test; diagnose and fix only if it fails
-Testing -> Debugging -> Development -> Testing
-
-find bottleneck; optimize; prove gain
-Performance -> optional Investigation -> Development -> Performance
-
-review then fix confirmed findings
-Review -> Development -> Testing
-```
-
-Each arrow is conditional. Reading code, running tests, checking correctness, collecting a local
-measurement, or adding diagnostic instrumentation remains supporting activity inside the current
-workflow. Transition only when the primary deliverable changes.
-
-## 5. Transition Compactly
-
-Reuse current context or an existing artifact; do not create a transition document by default.
+Reading code, running tests, checking correctness, collecting a supporting measurement, or adding
+diagnostic instrumentation stays inside the owner. Transition only when the primary requested result
+changes, for example:
 
 ```text
-From / To:
-Current Objective:
-Verified Findings / Evidence:
-Constraints:
-Changed Files:
-Known Reproduction / Procedure:
-Required Next Action:
-Verification Needed:
+unknown failure -> proven cause -> requested repair -> independent regression result
+Debugging       -> Development  -> Testing
+
+failed check -> requested diagnosis -> requested repair -> rerun
+Testing      -> Debugging           -> Development     -> Testing
 ```
 
-Carry only what the destination needs and stop applying the previous workflow.
+Every arrow is conditional. A review does not authorize fixes; diagnosis, testing, benchmarking, and
+explanation do not authorize production changes unless the request includes them.
 
-## 6. Common Rules
+## Transition Compactly
 
-- Use the smallest process that can produce trustworthy evidence.
-- The router creates no artifacts; the selected workflow owns proportional artifacts.
-- Preserve user work, avoid unrelated changes, and state unverified assumptions.
-- Report blocked verification and inspect the final diff after modifications.
-- Prefer current code and git diff for implementation, actual output for runtime behavior, and the
-  selected workflow's designated artifacts for workflow state. Correct stale documentation.
+Reuse current evidence; do not create a transition document by default. Carry only the destination's
+objective, verified evidence, constraints, changed files, reproduction or procedure, next action,
+and verification need. Stop applying the previous procedure.
 
-## 7. Subagents
+## Common Boundaries
 
-The routing phase must not create subagents. A selected workflow may use task-derived subagents only
-with clear ownership, weak dependencies, low edit-conflict risk, explicit inputs and outputs, and
-independent verification. LARGE does not imply multi-agent work; keep shared-contract work sequential.
-
-## 8. Ambiguity
-
-Choose a reasonable reversible route from context. Ask one concise question only when two routes
-would authorize materially different actions or deliverables. Do not infer permission to implement
-from a request to explain, diagnose, test, benchmark, or review.
+- Use the smallest process that can support trustworthy claims.
+- The router creates no artifacts or subagents.
+- Preserve user work, report blocked evidence, and inspect the final diff after modifications.
+- Prefer current code and diff for implementation, actual output for runtime behavior, and raw
+  measurements for performance.
+- A workflow may use task-derived subagents only for independent, low-conflict work with explicit
+  inputs, outputs, and verification. Scale alone never requires them.
+- Ask only when ambiguity would authorize materially different actions; otherwise choose a reversible
+  route and state the assumption.

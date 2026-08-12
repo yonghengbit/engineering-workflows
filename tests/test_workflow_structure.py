@@ -1,4 +1,7 @@
+import json
 import re
+import subprocess
+import sys
 import unittest
 from pathlib import Path
 
@@ -63,7 +66,7 @@ class WorkflowStructureTests(unittest.TestCase):
         fields, body = read_frontmatter(skill_md)
         self.assertEqual({"name", "description"}, set(fields))
         self.assertEqual("engineering-workflow", fields["name"])
-        self.assertIn("Use for", fields["description"])
+        self.assertRegex(fields["description"], r"\bUse (?:explicitly|when|for)\b")
         self.assertLessEqual(len(fields["description"]), 420)
         self.assertLess(len(skill_md.read_text(encoding="utf-8").splitlines()), 500)
         self.assertNotRegex(body, r"(?i)\bTODO\b|\[TODO\]")
@@ -72,6 +75,7 @@ class WorkflowStructureTests(unittest.TestCase):
         interface = (SKILL / "agents" / "openai.yaml").read_text(encoding="utf-8")
         self.assertIn('display_name: "Engineering Workflow"', interface)
         self.assertIn("$engineering-workflow", interface)
+        self.assertIn("allow_implicit_invocation: false", interface)
         short = re.search(r'short_description:\s*"([^"]+)"', interface)
         self.assertIsNotNone(short)
         self.assertGreaterEqual(len(short.group(1)), 25)
@@ -93,8 +97,8 @@ class WorkflowStructureTests(unittest.TestCase):
 
     def test_router_maps_each_intent_to_one_workflow(self) -> None:
         top = (SKILL / "SKILL.md").read_text(encoding="utf-8")
-        routing = top.split("## 2. Route the Current Deliverable", 1)[1].split(
-            "## 3. Load Progressively", 1
+        routing = top.split("## Route by Requested Result", 1)[1].split(
+            "## Load Progressively", 1
         )[0]
         expected = {
             "Development": "references/development/workflow.md",
@@ -111,8 +115,8 @@ class WorkflowStructureTests(unittest.TestCase):
 
     def test_progressive_loading_is_explicit(self) -> None:
         top = (SKILL / "SKILL.md").read_text(encoding="utf-8")
-        self.assertIn("Load exactly one workflow file", top)
-        self.assertIn("Never preload all workflows or strategies", top)
+        self.assertRegex(top, r"Load exactly one workflow(?: file)?")
+        self.assertRegex(top, r"Never preload (?:all workflows or strategies|alternatives)")
         for relative in sorted(EXPECTED_REFERENCES):
             if relative.endswith("workflow.md"):
                 self.assertIn(f"`references/{relative}`", top)
@@ -122,10 +126,10 @@ class WorkflowStructureTests(unittest.TestCase):
         top = (SKILL / "SKILL.md").read_text(encoding="utf-8")
         references = SKILL / "references"
 
-        self.assertLessEqual(len(top), 5_000)
+        self.assertLessEqual(len(top), 4_200)
 
         intent_budgets = {
-            "development/workflow.md": 3_500,
+            "development/workflow.md": 2_700,
             "testing/workflow.md": 2_800,
             "debugging/workflow.md": 4_200,
             "performance/workflow.md": 4_200,
@@ -143,23 +147,28 @@ class WorkflowStructureTests(unittest.TestCase):
         quick_path = top + (references / "testing/workflow.md").read_text(
             encoding="utf-8"
         ) + (references / "testing/quick.md").read_text(encoding="utf-8")
-        self.assertLessEqual(len(small_path), 9_200)
-        self.assertLessEqual(len(quick_path), 8_500)
+        self.assertLessEqual(len(small_path), 7_500)
+        self.assertLessEqual(len(quick_path), 7_500)
+
+        mixed_path = top + "".join(
+            (references / relative).read_text(encoding="utf-8")
+            for relative in (
+                "debugging/workflow.md",
+                "development/workflow.md",
+                "development/small.md",
+                "testing/workflow.md",
+                "testing/quick.md",
+            )
+        )
+        self.assertLessEqual(len(mixed_path), 14_800)
         for relative in sorted(EXPECTED_REFERENCES):
             if not relative.endswith("workflow.md"):
                 self.assertIn(f"`references/{relative}`", top)
 
     def test_router_does_not_own_agents_or_artifacts(self) -> None:
         top = (SKILL / "SKILL.md").read_text(encoding="utf-8")
-        self.assertIn("The routing phase must not create subagents", top)
-        self.assertIn("The router creates no artifacts", top)
-        for condition in (
-            "clear ownership",
-            "weak dependencies",
-            "low edit-conflict",
-            "explicit inputs and outputs",
-            "independent verification",
-        ):
+        self.assertIn("The router creates no artifacts or subagents", top)
+        for condition in ("independent", "low-conflict", "explicit", "verification"):
             self.assertIn(condition, top)
 
     def test_user_and_author_docs_match_canonical_entry(self) -> None:
@@ -201,6 +210,10 @@ class WorkflowStructureTests(unittest.TestCase):
             *sorted(SKILL.rglob("*.md")),
             *sorted((ROOT / "tests").glob("*.md")),
             *sorted((ROOT / "tests").glob("*.py")),
+            *sorted((ROOT / "tests" / "evals").rglob("*.md")),
+            *sorted((ROOT / "tests" / "evals").rglob("*.json")),
+            *sorted((ROOT / "tests" / "evals").rglob("*.jsonl")),
+            *sorted((ROOT / "tests" / "evals").rglob("*.py")),
         ]
         for source in text_files:
             for line_number, line in enumerate(
@@ -240,6 +253,47 @@ class WorkflowStructureTests(unittest.TestCase):
         proposals = ROOT / "proposals"
         if proposals.exists():
             self.assertEqual([], list(proposals.rglob("SKILL.md")))
+
+    def test_paired_forward_eval_is_reproducible(self) -> None:
+        evals = ROOT / "tests" / "evals"
+        rubric = json.loads((evals / "rubric.json").read_text(encoding="utf-8"))
+        self.assertEqual({f"C{index}" for index in range(1, 9)}, set(rubric))
+        self.assertTrue(all(len(checks) == 6 for checks in rubric.values()))
+
+        scores = {}
+        for label in ("baseline", "treatment"):
+            run = evals / "results" / f"{label}-inherited-codex-medium-2026-08-12.jsonl"
+            completed = subprocess.run(
+                [sys.executable, str(evals / "score_run.py"), str(run)],
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            scores[label] = json.loads(completed.stdout)
+            self.assertEqual(48, scores[label]["total"])
+
+        self.assertGreater(scores["treatment"]["passed"], scores["baseline"]["passed"])
+
+        holdout_scores = {}
+        for label in ("baseline", "treatment"):
+            run = (
+                evals
+                / "results"
+                / f"holdout-{label}-inherited-codex-medium-2026-08-12.jsonl"
+            )
+            completed = subprocess.run(
+                [sys.executable, str(evals / "score_run.py"), str(run)],
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            holdout_scores[label] = json.loads(completed.stdout)
+            self.assertEqual(48, holdout_scores[label]["total"])
+
+        self.assertGreater(
+            holdout_scores["treatment"]["passed"], holdout_scores["baseline"]["passed"]
+        )
+        self.assertEqual(8, holdout_scores["treatment"]["passed"] - holdout_scores["baseline"]["passed"])
 
 
 if __name__ == "__main__":

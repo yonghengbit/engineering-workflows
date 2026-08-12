@@ -79,14 +79,19 @@ context small while retaining detailed execution rules.
 Progressive loading only helps if each loaded layer stays concise. Structural tests therefore enforce
 character budgets as a deterministic proxy for token cost:
 
-- top-level `SKILL.md`: at most 5,000 characters;
-- common SMALL Development path: at most 9,200 loaded characters;
-- common QUICK Testing path: at most 8,500 loaded characters;
+- top-level `SKILL.md`: at most 4,200 characters;
+- common SMALL Development path: at most 7,500 loaded characters;
+- common QUICK Testing path: at most 7,500 loaded characters;
+- common Debugging -> SMALL Development -> QUICK Testing path: at most 14,800 characters;
 - each intent workflow has its own bounded size.
 
-At roughly four English characters per token, the current SMALL Development path is about 2.2k
-tokens and QUICK Testing about 2.0k tokens, excluding repository context and tool output. This proxy
+At roughly four English characters per token, the current SMALL Development and QUICK Testing paths
+are each about 1.9k tokens, excluding repository context and tool output. This proxy
 is intentionally approximate; its purpose is preventing silent prompt growth, not predicting billing.
+
+The skill disables implicit invocation by default. Native Codex therefore remains the zero-body-cost
+path for routine work; users opt into the workflow when consistency or evidence discipline justifies
+the added context.
 
 The design follows mature skill practices: the
 [Anthropic skill creator](https://github.com/anthropics/skills/blob/main/skills/skill-creator/SKILL.md)
@@ -135,8 +140,8 @@ The router creates no artifacts. Each selected workflow decides:
 | Workflow / Strategy | Artifacts |
 |---|---|
 | Development / SMALL | none |
-| Development / MEDIUM | `PLAN.md`, `HANDOFF.md` |
-| Development / LARGE | `DESIGN.md`, `PLAN.md`, `HANDOFF.md` |
+| Development / MEDIUM | `PLAN.md` for durable checkpoints; `HANDOFF.md` only for continuation |
+| Development / LARGE | decision/phase artifacts when needed; `HANDOFF.md` only for continuation |
 | Development / VERY_LARGE | `DESIGN.md`, `ROADMAP.md`, `plans/*`, `handoffs/*` |
 | Testing / QUICK | none |
 | Testing / STRUCTURED | `TEST_PLAN.md`, `TEST_REPORT.md` |

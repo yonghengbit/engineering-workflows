@@ -1,4 +1,6 @@
 interface:
   display_name: "Engineering Workflow"
-  short_description: "Route and execute engineering work by primary intent"
-  default_prompt: "Use $engineering-workflow to complete this engineering task with the appropriate workflow."
+  short_description: "Control complex engineering work with proportional evidence"
+  default_prompt: "Use $engineering-workflow to complete this mixed or evidence-sensitive engineering task."
+policy:
+  allow_implicit_invocation: false
