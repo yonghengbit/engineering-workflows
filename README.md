@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="assets/engineering-workflows-logo.svg" width="132" alt="Engineering Workflows logo">
+<img src="assets/engineering-workflows-logo.svg" width="180" alt="Engineering Workflows logo">
 
 # Engineering Workflows for Codex
 
