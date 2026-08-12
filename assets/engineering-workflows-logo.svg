@@ -1,0 +1,39 @@
+<svg width="320" height="320" viewBox="0 0 320 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="flow" x1="83" y1="78" x2="239" y2="244" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#38BDF8"/>
+      <stop offset="0.52" stop-color="#6366F1"/>
+      <stop offset="1" stop-color="#A855F7"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Six workflow nodes -->
+  <g fill="#CBD5E1">
+    <circle cx="160" cy="78" r="8"/>
+    <circle cx="231" cy="119" r="8"/>
+    <circle cx="231" cy="201" r="8"/>
+    <circle cx="160" cy="242" r="8"/>
+    <circle cx="89" cy="201" r="8"/>
+    <circle cx="89" cy="119" r="8"/>
+  </g>
+
+  <!-- Six intents routed through one engineering workflow -->
+  <path d="M160 78L231 119L231 201L160 242L89 201L89 119L160 78Z"
+        stroke="url(#flow)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <g stroke="url(#flow)" stroke-width="5" stroke-linecap="round">
+    <path d="M160 92V122"/>
+    <path d="M218 126L193 141"/>
+    <path d="M218 194L193 179"/>
+    <path d="M160 228V198"/>
+    <path d="M102 194L127 179"/>
+    <path d="M102 126L127 141"/>
+  </g>
+
+  <!-- Central E + forward arrow: engineering execution -->
+  <rect x="124" y="124" width="72" height="72" rx="22" fill="#111827"/>
+  <path d="M144 143H170M144 160H163M144 177H170"
+        stroke="#F8FAFC" stroke-width="8" stroke-linecap="round"/>
+  <path d="M166 160H181M175 152L183 160L175 168"
+        stroke="url(#flow)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

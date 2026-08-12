@@ -1,4 +1,68 @@
+<div align="center">
+
+<img src="assets/engineering-workflows-logo.svg" width="132" alt="Engineering Workflows logo">
+
 # Engineering Workflows for Codex
+
+**One entrypoint. Six workflows. Evidence-driven engineering.**
+
+A goal-first engineering workflow for Codex that chooses the right amount of process for the task,
+loads only what it needs, and treats verification as part of the result—not an afterthought.
+
+[![Codex Skill](https://img.shields.io/badge/Codex-Skill-111827?style=flat-square)](#one-minute-installation)
+[![Workflows](https://img.shields.io/badge/workflows-6-6366F1?style=flat-square)](#six-workflows-one-interface)
+[![Progressive Loading](https://img.shields.io/badge/context-progressive_loading-0EA5E9?style=flat-square)](#why-this-exists)
+[![Explicit Opt-in](https://img.shields.io/badge/invocation-explicit_opt--in-8B5CF6?style=flat-square)](#one-minute-usage)
+[![Holdout](https://img.shields.io/badge/holdout-43%2F48_%2889.6%25%29-10B981?style=flat-square)](#measured-scope)
+
+[Why it exists](#why-this-exists) ·
+[Install](#one-minute-installation) ·
+[Use](#one-minute-usage) ·
+[Architecture](docs/architecture.md) ·
+[Full guide](docs/usage.md)
+
+</div>
+
+---
+
+## Why this exists
+
+Engineering tasks do not all need the same ceremony. A one-line fix should not pay the process cost of
+a cross-subsystem redesign, while a performance claim or unknown crash should not be accepted without
+controlled evidence.
+
+Engineering Workflows gives Codex one explicit entrypoint and lets the current objective determine the
+method:
+
+| Principle | What it means |
+|---|---|
+| **Goal-first routing** | Describe the result you want; the framework selects the primary engineering intent. |
+| **Proportional process** | SMALL work stays light; larger or higher-risk work earns planning, artifacts, or subagents only when useful. |
+| **Evidence-driven completion** | Tests, benchmarks, root-cause proof, and review findings are treated as evidence with explicit PASS / FAIL / BLOCKED semantics. |
+
+### Six workflows, one interface
+
+| Intent | Primary question |
+|---|---|
+| **Development** | What software behavior should be intentionally changed? |
+| **Testing** | Does the system satisfy explicit required criteria? |
+| **Debugging** | What causes this unexpected behavior? |
+| **Performance** | How fast is it, why, and under what controlled conditions? |
+| **Investigation** | How does the existing system actually work? |
+| **Review** | What problems or risks exist in this existing change or design? |
+
+You invoke one skill:
+
+```text
+$engineering-workflow
+```
+
+The framework handles routing, workflow-specific strategy, verification depth, optional artifacts, and
+objective transitions.
+
+---
+
+## What it is
 
 A single opt-in Codex skill for mixed, high-risk, and evidence-sensitive engineering work. It routes
 the current result to the right method and applies only as much process as the task needs.
