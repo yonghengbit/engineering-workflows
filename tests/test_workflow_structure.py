@@ -67,10 +67,13 @@ class WorkflowStructureTests(unittest.TestCase):
         self.assertEqual({"name", "description"}, set(fields))
         self.assertEqual("engineering-workflow", fields["name"])
         self.assertRegex(fields["description"], r"\bUse (?:explicitly|when|for)\b")
+        self.assertNotRegex(fields["description"], r"(?i)\bcodex\b|\bclaude\b|\bopenai\b")
         self.assertLessEqual(len(fields["description"]), 420)
         self.assertLess(len(skill_md.read_text(encoding="utf-8").splitlines()), 500)
         self.assertNotRegex(body, r"(?i)\bTODO\b|\[TODO\]")
         self.assertFalse((SKILL / "README.md").exists())
+        self.assertIn("`AGENTS.md`", body)
+        self.assertIn("`CLAUDE.md`", body)
 
         interface = (SKILL / "agents" / "openai.yaml").read_text(encoding="utf-8")
         self.assertIn('display_name: "Engineering Workflow"', interface)
@@ -178,8 +181,14 @@ class WorkflowStructureTests(unittest.TestCase):
             encoding="utf-8"
         )
         self.assertIn("docs/usage.md", readme)
+        self.assertIn("# Engineering Workflows\n", readme)
+        self.assertNotIn("# Engineering Workflows for Codex", readme)
+        self.assertIn("open Agent Skills", readme)
         self.assertIn("$engineering-workflow", usage)
-        self.assertIn("AGENTS.md 与 engineering-workflow 的区别", usage)
+        self.assertIn("/engineering-workflow", usage)
+        self.assertIn(".agents/skills", usage)
+        self.assertIn(".claude/skills", usage)
+        self.assertIn("宿主指令文件与 engineering-workflow 的区别", usage)
         self.assertIn("one installable `SKILL.md`", contract)
         for intent in (
             "Development",

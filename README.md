@@ -2,17 +2,17 @@
 
 <img src="assets/engineering-workflows-logo.svg" width="240" alt="Engineering Workflows logo">
 
-# Engineering Workflows for Codex
+# Engineering Workflows
 
 **One entrypoint. Six workflows. Evidence-driven engineering.**
 
-A goal-first engineering workflow for Codex that chooses the right amount of process for the task,
+A goal-first workflow for AI coding agents that chooses the right amount of engineering process,
 loads only what it needs, and treats verification as part of the result—not an afterthought.
 
-[![Codex Skill](https://img.shields.io/badge/Codex-Skill-111827?style=flat-square)](#one-minute-installation)
+[![Agent Skills](https://img.shields.io/badge/Agent_Skills-open_standard-111827?style=flat-square)](https://agentskills.io)
 [![Workflows](https://img.shields.io/badge/workflows-6-6366F1?style=flat-square)](#six-workflows-one-interface)
 [![Progressive Loading](https://img.shields.io/badge/context-progressive_loading-0EA5E9?style=flat-square)](#why-this-exists)
-[![Explicit Opt-in](https://img.shields.io/badge/invocation-explicit_opt--in-8B5CF6?style=flat-square)](#one-minute-usage)
+[![Explicit First](https://img.shields.io/badge/invocation-explicit_first-8B5CF6?style=flat-square)](#one-minute-usage)
 [![Holdout](https://img.shields.io/badge/holdout-43%2F48_%2889.6%25%29-10B981?style=flat-square)](#measured-scope)
 
 [Why it exists](#why-this-exists) ·
@@ -31,8 +31,8 @@ Engineering tasks do not all need the same ceremony. A one-line fix should not p
 a cross-subsystem redesign, while a performance claim or unknown crash should not be accepted without
 controlled evidence.
 
-Engineering Workflows gives Codex one explicit entrypoint and lets the current objective determine the
-method:
+Engineering Workflows gives a compatible coding agent one entrypoint and lets the current objective
+determine the method:
 
 | Principle | What it means |
 |---|---|
@@ -51,10 +51,12 @@ method:
 | **Investigation** | How does the existing system actually work? |
 | **Review** | What problems or risks exist in this existing change or design? |
 
-You invoke one skill:
+You invoke one skill using the host's syntax:
 
 ```text
-$engineering-workflow
+Codex CLI / IDE  $engineering-workflow
+ChatGPT          @engineering-workflow
+Claude Code      /engineering-workflow
 ```
 
 The framework handles routing, workflow-specific strategy, verification depth, optional artifacts, and
@@ -64,8 +66,8 @@ objective transitions.
 
 ## What it is
 
-A single opt-in Codex skill for mixed, high-risk, and evidence-sensitive engineering work. It routes
-the current result to the right method and applies only as much process as the task needs.
+A portable Agent Skill for mixed, high-risk, and evidence-sensitive engineering work. It routes the
+current result to the right method and applies only as much process as the task needs.
 
 ```text
 User goal + repository constraints
@@ -82,8 +84,12 @@ Users normally describe the outcome they want; they do not need to choose a work
 or number of agents.
 
 The skill uses progressive loading and tested context budgets: it loads one intent workflow and, when
-needed, one scale/strategy reference—not the whole library. Routine low-risk work can use native
-Codex directly and pays no selected-skill body cost.
+needed, one scale/strategy reference—not the whole library. Routine low-risk work can use the host
+agent directly and pays no selected-skill body cost.
+
+The core skill uses the open Agent Skills format: a `SKILL.md` entrypoint plus progressively loaded
+references. `agents/openai.yaml` is an optional OpenAI integration for UI metadata and invocation
+policy; non-OpenAI hosts can ignore it.
 
 ## Why Use It
 
@@ -96,22 +102,23 @@ Codex directly and pays no selected-skill body cost.
 
 ## One-minute Installation
 
-Repository scope:
+Codex repository scope:
 
 ```bash
 mkdir -p <repo>/.agents/skills
 cp -r skills/engineering-workflow <repo>/.agents/skills/
 ```
 
-User scope:
+Claude Code repository scope:
 
 ```bash
-mkdir -p "$HOME/.agents/skills"
-cp -r skills/engineering-workflow "$HOME/.agents/skills/"
+mkdir -p <repo>/.claude/skills
+cp -r skills/engineering-workflow <repo>/.claude/skills/
 ```
 
 Install only `engineering-workflow`; the six workflows are internal progressive references, not
-separate skills.
+separate skills. User-scope paths and other compatible hosts are covered in the
+[full installation guide](docs/usage.md#2-安装).
 
 ## One-minute Usage
 
@@ -125,8 +132,8 @@ LMCache 的 REGISTER_KV_CACHE 在 DCU 环境报 HIP error，
 The framework starts with Debugging, transitions to Development after root-cause proof, then uses
 Testing for regression verification.
 
-The skill is explicit-invocation by default. This avoids broad automatic activation on routine edits
-and makes its context cost a user choice.
+The skill is explicit-first. OpenAI hosts enforce this through `agents/openai.yaml`; other hosts use
+their own invocation policy, so explicit selection is the portable behavior.
 
 ## Measured Scope
 
@@ -169,4 +176,5 @@ engineering-workflows/
 - [路线图](docs/roadmap.md)
 
 Repository-specific build, test, style, and platform rules still belong in the target repository's
-`AGENTS.md`; this skill provides task-execution methodology.
+host instruction files, such as `AGENTS.md` or `CLAUDE.md`; this skill provides task-execution
+methodology.

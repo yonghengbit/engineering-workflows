@@ -8,11 +8,11 @@ The framework exposes one installable skill:
 skills/engineering-workflow/
 ```
 
-The top-level `SKILL.md` is a routing policy used by the current Codex main agent. It is not a
-separate router agent and does not execute child procedures itself.
+The top-level `SKILL.md` is a routing policy used by the current host agent. It is not a separate
+router agent and does not execute child procedures itself.
 
 ```text
-User Prompt + Repository Context + AGENTS.md constraints
+User Prompt + Repository Context + host instruction constraints
     -> engineering-workflow
     -> Primary Intent routing
     -> one workflow reference
@@ -26,8 +26,9 @@ engineering goals without naming an activity type.
 
 ## 2. Repository Rules and Workflow Method
 
-`AGENTS.md` owns repository-specific constraints: build commands, test conventions, editable paths,
-style, platforms, and safety rules.
+Host instruction files such as `AGENTS.md`, `AGENTS.override.md`, or `CLAUDE.md` own
+repository-specific constraints: build commands, test conventions, editable paths, style, platforms,
+and safety rules.
 
 `engineering-workflow` owns task methodology: primary intent, process depth, artifacts, verification,
 dynamic subagent decisions, and objective transitions.
@@ -89,11 +90,14 @@ At roughly four English characters per token, the current SMALL Development and 
 are each about 1.9k tokens, excluding repository context and tool output. This proxy
 is intentionally approximate; its purpose is preventing silent prompt growth, not predicting billing.
 
-The skill disables implicit invocation by default. Native Codex therefore remains the zero-body-cost
-path for routine work; users opt into the workflow when consistency or evidence discipline justifies
-the added context.
+The skill is explicit-first. OpenAI hosts enforce this through optional `agents/openai.yaml`; other
+hosts apply their own activation policy. The direct host-agent path remains available for routine
+work, while users opt into the workflow when consistency or evidence discipline justifies the added
+context.
 
-The design follows mature skill practices: the
+The core format follows the
+[open Agent Skills specification](https://agentskills.io/specification), which is shared by
+skills-compatible hosts. The design also follows mature skill practices: the
 [Anthropic skill creator](https://github.com/anthropics/skills/blob/main/skills/skill-creator/SKILL.md)
 uses metadata → `SKILL.md` → on-demand resources; the
 [OpenAI skill examples](https://github.com/openai/skills) emphasize reusable scoped resources; and
@@ -177,3 +181,20 @@ The repository is still first-version and has no documented external dependency 
 names. The v2 migration therefore removes them instead of adding wrappers that would remain alternate
 implicit entry points. If compatibility becomes necessary later, wrappers may only pin Primary Intent
 and must delegate all procedure to this canonical skill.
+
+## 11. Host Portability
+
+The canonical skill keeps host-neutral procedure in `SKILL.md` and `references/`. Product-specific
+discovery paths, invocation syntax, and UI metadata stay outside the workflow rules:
+
+```text
+portable core       SKILL.md + references/
+OpenAI extension    agents/openai.yaml
+Codex discovery     .agents/skills/
+Claude Code         .claude/skills/
+other hosts         their documented Agent Skills directory
+```
+
+Portability means the workflow can run in a compatible host, not that every host exposes identical
+subagent, permission, or invocation features. Each workflow uses available host capabilities
+proportionally and treats unavailable validation as BLOCKED rather than inventing evidence.

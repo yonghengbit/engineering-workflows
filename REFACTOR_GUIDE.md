@@ -20,7 +20,7 @@
 
 本次重构的核心目标是解决一个架构问题：
 
-> 当前各个 workflow 作为平级 Codex Skill 暴露，并由 Codex 自身 skill matching 或用户显式选择 workflow；新的设计应改为一个统一 Engineering Workflow 入口，由 Codex 按照我们定义的轻量 Routing Policy 判断当前任务的 Primary Intent，再加载对应 workflow。
+> 当前各个 workflow 作为平级 Agent Skill 暴露，并由宿主 agent 自身 skill matching 或用户显式选择 workflow；新的设计应改为一个统一 Engineering Workflow 入口，由宿主 agent 按照我们定义的轻量 Routing Policy 判断当前任务的 Primary Intent，再加载对应 workflow。
 
 最终用户应该主要表达“我要完成什么工程任务”，而不是自己判断：
 
@@ -62,7 +62,7 @@ Workflow-specific strategy / scale
 
 ## 2.1 一个统一入口
 
-整个 framework 应有一个主要 Codex Skill：
+整个 framework 应有一个主要 Agent Skill：
 
 ```text
 engineering-workflow
@@ -121,7 +121,7 @@ Router 本质上只是：
 Routing Policy
 ```
 
-由当前 Codex 主 agent 根据：
+由当前宿主主 agent 根据：
 
 ```text
 用户 Prompt
@@ -1009,7 +1009,7 @@ systematic-debugging
 不应继续作为平级、默认自动发现的主要 workflow，否则会重新出现：
 
 ```text
-Codex built-in skill matching
+host-native skill matching
 直接绕过 Router
 ```
 
@@ -1162,10 +1162,10 @@ workflow designated artifacts
 不要：
 
 ```text
-依赖 Codex 自由 skill matching 完成内部 workflow routing。
+依赖宿主 agent 自由 skill matching 完成内部 workflow routing。
 ```
 
-Codex 可以判断，但必须按照本 framework 的 routing policy 判断。
+宿主 agent 可以判断，但必须按照本 framework 的 routing policy 判断。
 
 不要：
 
@@ -1336,7 +1336,7 @@ HANDOFF.md
 解释：
 
 ```text
-什么时候 Codex 可能创建 subagent
+什么时候宿主 agent 可能创建 subagent
 为什么不是所有大任务都需要 multi-agent
 agent role 为什么根据任务动态生成
 ```
@@ -1645,7 +1645,7 @@ Dynamic Execution > Ceremony
 12. 还有哪些已知限制
 ```
 
-如果在实际实现过程中发现本设计与 Codex Skill 的真实机制存在冲突，不要默默绕过。
+如果在实际实现过程中发现本设计与宿主 Agent Skill 的真实机制存在冲突，不要默默绕过。
 
 应：
 
@@ -1658,4 +1658,4 @@ Dynamic Execution > Ceremony
 
 本次重构最终追求的不是“Skill 数量更多”，而是：
 
-> 用户只需要描述工程目标，Codex 在一个稳定、可解释的工程工作流框架下，自主选择正确的方法、正确的过程深度和必要的执行资源。
+> 用户只需要描述工程目标，宿主 agent 在一个稳定、可解释的工程工作流框架下，自主选择正确的方法、正确的过程深度和必要的执行资源。

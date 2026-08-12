@@ -1,6 +1,6 @@
 ---
 name: engineering-workflow
-description: Coordinate mixed, high-risk, or evidence-sensitive software engineering work across Development, Testing, Debugging, Performance, Investigation, and Review. Use explicitly when a task needs reliable routing, proportional process, or controlled transitions between objectives; use native Codex directly for routine low-risk work.
+description: Coordinate mixed, high-risk, or evidence-sensitive engineering across Development, Testing, Debugging, Performance, Investigation, and Review. Use explicitly with Agent Skills-compatible agents for routing, proportional process, or controlled objective transitions; use the host directly for routine low-risk work.
 ---
 
 # Engineering Workflow
@@ -10,8 +10,9 @@ changes. Treat this router as policy for the current agent, not as an executor o
 
 ## Apply Repository Constraints
 
-Follow applicable `AGENTS.md` and `AGENTS.override.md`. Inspect repository and git state when relevant.
-Repository rules constrain every route but do not select it.
+Follow repository and host instructions such as `AGENTS.md`, `AGENTS.override.md`, `CLAUDE.md`, or
+equivalents. Inspect repository and git state when relevant. These rules constrain routes but do not
+select one.
 
 ## Route by Requested Result
 

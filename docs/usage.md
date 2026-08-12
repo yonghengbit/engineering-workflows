@@ -37,9 +37,9 @@ skills/engineering-workflow/
 
 不要单独复制 `references/` 中的 Development 或 Debugging；它们不是独立 skill。
 
-### 2.1 Repository scope
+### 2.1 Codex
 
-希望某个仓库或团队共享时，把 skill 放到仓库的 `.agents/skills/`：
+仓库或团队共享时，把 skill 放到仓库的 `.agents/skills/`：
 
 ```bash
 mkdir -p <repo>/.agents/skills
@@ -52,11 +52,7 @@ cp -r skills/engineering-workflow <repo>/.agents/skills/
 <repo>/.agents/skills/engineering-workflow/SKILL.md
 ```
 
-这是团队仓库最推荐的方式，因为 workflow 版本可以随代码一起评审和更新。
-
-### 2.2 User scope
-
-希望所有本地仓库都能使用时，安装到用户目录：
+个人在所有本地仓库使用时，安装到用户目录：
 
 ```bash
 mkdir -p "$HOME/.agents/skills"
@@ -74,16 +70,65 @@ Codex 会从当前目录到仓库根目录扫描 `.agents/skills`，也会读取
 `$HOME/.agents/skills`。如果修改未出现，重启 Codex。完整机制见
 [OpenAI 官方 Build skills 文档](https://developers.openai.com/codex/skills)。
 
-### 2.3 应该选哪一种
+### 2.2 Claude Code
+
+仓库或团队共享：
+
+```bash
+mkdir -p <repo>/.claude/skills
+cp -r skills/engineering-workflow <repo>/.claude/skills/
+```
+
+个人在所有本地仓库使用：
+
+```bash
+mkdir -p "$HOME/.claude/skills"
+cp -r skills/engineering-workflow "$HOME/.claude/skills/"
+```
+
+最终路径分别为：
+
+```text
+<repo>/.claude/skills/engineering-workflow/SKILL.md
+$HOME/.claude/skills/engineering-workflow/SKILL.md
+```
+
+Claude Code 可以自动匹配 skill，也可以通过 `/engineering-workflow` 显式调用。安装位置与
+调用机制见 [Claude Code 官方 Skills 文档](https://code.claude.com/docs/en/slash-commands)。
+
+### 2.3 其他兼容 Agent
+
+本 skill 的可移植核心只有标准 `SKILL.md` 和相对引用的 `references/`。把完整的
+`engineering-workflow` 目录复制到宿主文档指定的 Agent Skills 目录，不要只复制
+`SKILL.md`，否则渐进加载的 workflow 会丢失。
+
+宿主必须支持开放 Agent Skills 格式以及读取同目录相对文件。目录位置、显式调用符号、
+自动匹配和 subagent 能力由宿主决定；本项目不会假设所有工具都使用 Codex 或 Claude Code
+的语法。格式规范见 [Agent Skills specification](https://agentskills.io/specification)。
+
+`agents/openai.yaml` 只是 OpenAI 产品的可选 UI 和调用策略扩展。其他宿主可以忽略它，
+核心 workflow 不依赖该文件执行。
+
+### 2.4 应该选哪一种
 
 - 团队共享、项目约束稳定：优先 Repository scope。
 - 个人在多个项目中复用：使用 User scope。
+- 根据实际宿主选择 `.agents/skills`、`.claude/skills` 或其官方指定目录。
 - 同名 skill 可能同时出现在 selector 中，因此不要在两个 scope 安装不同版本后期待它们
   自动合并。
 
 ## 3. 如何启动
 
-最明确的方式是显式调用：
+最明确、最可移植的方式是显式调用：
+
+| 宿主 | 显式调用 |
+|---|---|
+| Codex CLI / IDE extension | `$engineering-workflow` |
+| ChatGPT | `@engineering-workflow` |
+| Claude Code | `/engineering-workflow` |
+| 其他兼容 Agent | 使用宿主提供的 skill selector 或调用语法 |
+
+例如在 Codex 中：
 
 ```text
 $engineering-workflow
@@ -91,9 +136,10 @@ $engineering-workflow
 实现一个新的 KV Cache backend。
 ```
 
-在 Codex CLI 或 IDE extension 中也可以通过 `/skills` 查找 skill。当前版本默认关闭隐式
-调用，避免普通低风险任务自动承担 workflow body 的上下文成本。需要混合目标、严格证据链
-或团队一致流程时，显式使用 `$engineering-workflow`。
+在 Codex CLI 或 IDE extension 中也可以通过 `/skills` 查找 skill。OpenAI 集成通过
+`agents/openai.yaml` 关闭隐式调用，避免普通低风险任务自动承担 workflow body 的上下文
+成本。Claude Code 和其他宿主使用自己的 activation policy；无论宿主是否支持自动匹配，
+需要混合目标、严格证据链或团队一致流程时都建议显式调用。
 
 通常不需要告诉它：
 
@@ -190,8 +236,8 @@ SMALL 不会为了形式完整而生成这些文档。
 
 ## 7. Subagent 如何使用
 
-Router 不会创建 agent。选中 workflow 后，Codex 才结合当前 prompt 和 repository 判断是否
-存在可以安全并行的工作。
+Router 不会创建 agent。选中 workflow 后，当前宿主 agent 才结合 prompt、repository 和
+自身可用能力判断是否存在可以安全并行的工作。
 
 只有同时满足以下条件才适合 subagent：
 
@@ -207,19 +253,19 @@ LARGE 任务如果所有实现都依赖同一份新接口，则应该顺序执�
 Agent role 从实际任务动态产生，不存在固定的 `debug-agent`、`cuda-agent` 或
 `review-agent` taxonomy。任务很大也不等于一定 multi-agent。
 
-## 8. AGENTS.md 与 engineering-workflow 的区别
+## 8. 宿主指令文件与 engineering-workflow 的区别
 
 两者解决不同问题：
 
 ```text
-AGENTS.md
-= repository-specific rules
+AGENTS.md / CLAUDE.md / equivalent
+= repository-specific host rules
 
 engineering-workflow
 = task execution methodology
 ```
 
-目标仓库的 `AGENTS.md` 可以规定：
+目标仓库的宿主指令文件可以规定：
 
 - build 和 test 命令；
 - 代码风格与平台限制；
@@ -233,8 +279,8 @@ engineering-workflow
 - 是否需要 artifact、subagent 和哪些验证；
 - Primary Intent 何时发生 transition。
 
-不需要把本框架的 routing 规则复制到每个项目的 `AGENTS.md`。Repository rules 会先被
-遵守，但不拥有 workflow routing 权限。
+不需要把本框架的 routing 规则复制到每个项目的 `AGENTS.md`、`CLAUDE.md` 或等效文件。
+Repository rules 会先被遵守，但不拥有 workflow routing 权限。
 
 ## 9. 完整示例一：小开发
 
@@ -341,9 +387,9 @@ documentation。
 
 会有额外成本，但不是把全部 workflow 一次塞进上下文。
 
-Codex 启动时只看到 skill 的 `name` 和 `description`。当 `$engineering-workflow` 被显式调用或
-匹配后，才加载顶层 `SKILL.md`；确定 Primary Intent 后只加载一个 workflow；Development 和
-Testing 再各自只加载一个 scale/strategy reference。
+兼容 Agent Skills 的宿主通常先看到 skill 的 `name` 和 `description`。当
+`engineering-workflow` 被显式调用或匹配后，才加载顶层 `SKILL.md`；确定 Primary Intent
+后只加载一个 workflow；Development 和 Testing 再各自只加载一个 scale/strategy reference。
 
 例如 SMALL Development 的加载路径只有：
 
@@ -357,19 +403,20 @@ SKILL.md
 QUICK Testing 也约 1.9k tokens。实际 token 数受 tokenizer 影响，这些数字只是防止文件增长的
 工程预算。
 
-因为默认关闭隐式调用，普通工程任务也不会自动加载 skill body；安装后的 metadata 仍可能
-出现在 skill 列表中。显式调用确实比直接 Codex 多用一些 token，但 SMALL、QUICK、DIRECT
-路径不会创建无价值文档或默认使用 subagent。
+OpenAI 集成默认关闭隐式调用，因此普通工程任务不会自动加载 skill body；安装后的 metadata
+仍可能出现在 skill 列表中。其他宿主是否自动调用由其实现和用户设置决定。显式调用确实比
+直接使用宿主 agent 多用一些 token，但 SMALL、QUICK、DIRECT 路径不会创建无价值文档或
+默认使用 subagent。
 
-如果极度在意一次性小任务的 token，可以不显式调用，直接使用原生 Codex；需要稳定执行本
-框架时再使用 `$engineering-workflow`。
+如果极度在意一次性小任务的 token，可以不显式调用，直接使用宿主 agent；需要稳定执行本
+框架时再选择 `engineering-workflow`。
 
 仓库测试会限制常见路径、混合链路和各 intent reference 的字符预算，避免后续维护中重新
 膨胀。
 
 ## 14. 当前测试数据怎样理解
 
-`tests/evals/` 保存了同一继承 Codex 配置、medium reasoning 的 paired forward tests：baseline
+`tests/evals/` 保存的是同一继承 Codex 配置、medium reasoning 的 paired forward tests：baseline
 不加载 skill body，treatment 显式加载本 skill。当前 host 未暴露可核验的公开 model slug，
 因此结果不冒充特定模型数据。确定性 rubric 包含 48 个 routing、授权、证据、artifact、
 transition 和 subagent 检查点。
@@ -387,5 +434,5 @@ holdout prompts 在最终 rubric 冻结后才交给两个新 agent，评分后 r
 
 holdout 仍只有 8 个案例、不执行真实代码，而且 regex scorer 对同义表达敏感。因此它只能说明
 本 skill 在这组 prompts 上改善了 routing 和 evidence discipline，不能宣传为“编码成功率提高
-16.7%”。它也不证明成本、延迟或其他模型上的收益。原始 JSONL、冻结协议、rubric 和 scorer
-全部保留，可复查和扩展。
+16.7%”。它也不证明成本、延迟、Claude Code 或其他模型/宿主上的收益。原始 JSONL、冻结
+协议、rubric 和 scorer 全部保留，可复查和扩展。

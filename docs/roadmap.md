@@ -53,3 +53,12 @@ Status: **implemented**
 - durable artifacts based on decision, coordination, and continuation value;
 - paired baseline/treatment forward-test contract and deterministic scorer;
 - bounded public claims that separate routing discipline from executable task success.
+
+## v2.2 — Portable Agent Skill
+
+Status: **implemented**
+
+- host-neutral core instructions and metadata;
+- Codex and Claude Code installation and invocation guidance;
+- explicit separation between the open Agent Skills core and optional OpenAI metadata;
+- platform-specific evaluation claims preserved instead of generalized without evidence.
