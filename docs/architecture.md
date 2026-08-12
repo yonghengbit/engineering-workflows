@@ -1,122 +1,179 @@
 # Architecture
 
-## 1. Why the Framework Has Two Axes
+## 1. Canonical Entry Point
 
-Engineering tasks have at least two independent properties:
-
-```text
-Task Type  = what is the immediate engineering objective?
-Task Scale = how much structure does this objective require?
-```
-
-Treating these as one dimension causes process mismatch.
-
-Examples:
-
-- a one-command regression check is Testing, but tiny;
-- a cross-platform validation campaign is also Testing, but large;
-- a crash investigation may end in a two-line fix, but its primary workflow is Debugging until root cause is established;
-- a 30-line scheduler change can still be Large Development if it changes scheduling semantics.
-
-Therefore the framework first selects **primary intent**, then lets the selected workflow choose its own scale or strategy.
-
-## 2. Layers
+The framework exposes one installable skill:
 
 ```text
-Layer 0: Repository Rules
-AGENTS.md / AGENTS.override.md
-        │
-        ▼
-Layer 1: Primary Intent
-Development / Testing / Debugging /
-Performance / Investigation / Review
-        │
-        ▼
-Layer 2: Workflow Strategy
-Examples:
-Development -> SMALL / MEDIUM / LARGE / VERY_LARGE
-Testing     -> QUICK / STRUCTURED / VALIDATION (planned)
-        │
-        ▼
-Layer 3: Execution Artifacts
-PLAN, DESIGN, TEST_PLAN, DEBUG notes, benchmark results, etc.
-        │
-        ▼
-Layer 4: Verification and Transition
-Complete current workflow or transition to another one
+skills/engineering-workflow/
 ```
 
-## 3. Primary Workflows
+The top-level `SKILL.md` is a routing policy used by the current Codex main agent. It is not a
+separate router agent and does not execute child procedures itself.
 
-### Development
+```text
+User Prompt + Repository Context + AGENTS.md constraints
+    -> engineering-workflow
+    -> Primary Intent routing
+    -> one workflow reference
+    -> workflow-specific strategy or scale
+    -> execution + verification
+    -> optional transition
+```
 
-Goal: change software behavior intentionally.
+This prevents seven peer skills from competing through implicit skill matching and lets users express
+engineering goals without naming an activity type.
 
-Current implementation: `skills/adaptive-development/`.
+## 2. Repository Rules and Workflow Method
 
-### Testing
+`AGENTS.md` owns repository-specific constraints: build commands, test conventions, editable paths,
+style, platforms, and safety rules.
 
-Goal: determine whether behavior satisfies explicit criteria.
+`engineering-workflow` owns task methodology: primary intent, process depth, artifacts, verification,
+dynamic subagent decisions, and objective transitions.
 
-The workflow should optimize for test objective, matrix, baseline, environment, reproducibility, pass/fail criteria, and reporting.
+Repository instructions constrain every workflow but do not route the task.
 
-### Debugging
+## 3. Primary Intent Routing
 
-Goal: identify and prove the root cause of an unexpected symptom.
+The router asks which result the user wants now:
 
-The workflow should be evidence- and hypothesis-driven. Code modification is downstream of root-cause confirmation, not the initial objective.
+| Intent | Owning question |
+|---|---|
+| Development | What software behavior should be intentionally changed? |
+| Testing | Does the system satisfy explicit required criteria? |
+| Debugging | What causes this unexpected behavior? |
+| Performance | How fast is it, why, and under what controlled conditions? |
+| Investigation | How does the existing system actually work? |
+| Review | What problems or risks exist in this existing change or design? |
 
-### Performance
+The routing policy uses unknown failure, performance, understanding, review, explicit verification,
+then intentional change as precedence for genuinely mixed requests. This is a goal-based tie-breaker,
+not keyword scoring.
 
-Goal: measure, explain, or improve performance under controlled conditions.
+Once selected, the router stops and loads exactly one reference:
 
-The workflow should emphasize baseline, controlled variables, metrics, warmup, repetitions, environment, raw results, and statistical interpretation.
+```text
+references/<intent>/workflow.md
+```
 
-### Investigation
+## 4. Progressive Loading
 
-Goal: understand an implementation, call path, architecture, behavior, or technical question.
+The canonical skill does not load all procedures at startup.
 
-The workflow should distinguish verified facts, inference, hypotheses, and open questions.
+```text
+route Debugging
+    -> load references/debugging/workflow.md only
 
-### Review
+route Development
+    -> load references/development/workflow.md
+    -> classify LARGE
+    -> load references/development/large.md only
+```
 
-Goal: evaluate an existing change or design.
+Testing uses the same two-stage pattern for QUICK, STRUCTURED, or VALIDATION. This keeps routing
+context small while retaining detailed execution rules.
 
-The workflow should prioritize findings by severity and avoid silently turning review into implementation unless requested.
+### Context budgets
 
-## 4. Workflow Chaining
+Progressive loading only helps if each loaded layer stays concise. Structural tests therefore enforce
+character budgets as a deterministic proxy for token cost:
 
-A task can change primary intent during execution.
+- top-level `SKILL.md`: at most 4,200 characters;
+- common SMALL Development path: at most 7,500 loaded characters;
+- common QUICK Testing path: at most 7,500 loaded characters;
+- common Debugging -> SMALL Development -> QUICK Testing path: at most 14,800 characters;
+- each intent workflow has its own bounded size.
 
-Transitions should happen when the objective changes, not simply because another activity is present.
+At roughly four English characters per token, the current SMALL Development and QUICK Testing paths
+are each about 1.9k tokens, excluding repository context and tool output. This proxy
+is intentionally approximate; its purpose is preventing silent prompt growth, not predicting billing.
 
-Common chains:
+The skill disables implicit invocation by default. Native Codex therefore remains the zero-body-cost
+path for routine work; users opt into the workflow when consistency or evidence discipline justifies
+the added context.
+
+The design follows mature skill practices: the
+[Anthropic skill creator](https://github.com/anthropics/skills/blob/main/skills/skill-creator/SKILL.md)
+uses metadata → `SKILL.md` → on-demand resources; the
+[OpenAI skill examples](https://github.com/openai/skills) emphasize reusable scoped resources; and
+[addyosmani/agent-skills](https://github.com/addyosmani/agent-skills/blob/main/docs/skill-anatomy.md)
+explicitly recommends removing sections that do not change agent behavior. We keep the evidence and
+systematic discipline seen in [obra/superpowers](https://github.com/obra/superpowers), without making
+its full mandatory development chain the default for small tasks.
+
+## 5. Task Type and Strategy Are Separate
+
+```text
+Development  -> SMALL / MEDIUM / LARGE / VERY_LARGE
+Testing      -> QUICK / STRUCTURED / VALIDATION
+Debugging    -> DIRECT / SYSTEMATIC
+Performance  -> CHECK / COMPARISON / CHARACTERIZATION
+Investigation-> proportional artifact only
+Review       -> findings-first output
+```
+
+No common scale is forced onto every workflow. Strategy exists only when it materially changes
+execution.
+
+## 6. Supporting Activity and Transitions
+
+Reading code, running tests, measuring a local baseline, or adding diagnostic instrumentation may be
+supporting activity inside the current workflow. Ownership changes only when the primary deliverable
+changes.
 
 ```text
 Testing -> Debugging -> Development -> Testing
-```
-
-```text
-Performance -> Investigation -> Development -> Performance
-```
-
-```text
+Performance -> optional Investigation -> Development -> Performance
 Review -> Development -> Testing
+Investigation -> Development
 ```
 
-A transition should preserve relevant evidence and constraints, but the new workflow should own the next phase.
+Transitions load the destination reference on demand and carry a compact payload containing current
+objective, verified evidence, constraints, changed files, reproduction or procedure, next action, and
+verification needs. A transition does not require a new Markdown artifact.
 
-## 5. Why the Router Comes Last
+## 7. Proportional Artifacts
 
-The router only has value when it can route to stable workflows.
+The router creates no artifacts. Each selected workflow decides:
 
-Implementing it too early tends to create:
+| Workflow / Strategy | Artifacts |
+|---|---|
+| Development / SMALL | none |
+| Development / MEDIUM | `PLAN.md` for durable checkpoints; `HANDOFF.md` only for continuation |
+| Development / LARGE | decision/phase artifacts when needed; `HANDOFF.md` only for continuation |
+| Development / VERY_LARGE | `DESIGN.md`, `ROADMAP.md`, `plans/*`, `handoffs/*` |
+| Testing / QUICK | none |
+| Testing / STRUCTURED | `TEST_PLAN.md`, `TEST_REPORT.md` |
+| Testing / VALIDATION | `VALIDATION_PLAN.md`, `results/*`, `VALIDATION_REPORT.md` |
+| Debugging / DIRECT | none |
+| Debugging / SYSTEMATIC | `DEBUG.md` |
+| Performance / non-trivial | `BENCHMARK_PLAN.md`, `results/*`, `BENCHMARK_REPORT.md` |
+| Investigation / complex | `INVESTIGATION.md` |
+| Review | findings in response |
 
-- duplicated rules;
-- ambiguous ownership;
-- over-routing;
-- a monolithic skill that becomes difficult to evolve.
+## 8. Dynamic Subagents
 
-For now, users may invoke a workflow explicitly or rely on Codex skill matching.
+Routing never creates agents. After selection, the workflow and current repository determine whether
+independent work exists. Parallel work requires clear ownership, weak dependencies, low edit
+conflict, explicit inputs and outputs, and independent verification.
 
-Once at least Testing and Debugging are stable, the `engineering-router` can be implemented with real routing targets.
+Roles are derived from the task, such as two actual backend paths or an isolated test harness. The
+framework maintains no fixed specialist taxonomy, and LARGE does not imply multi-agent execution.
+
+## 9. Source of Truth
+
+```text
+implementation   current code + git diff
+runtime behavior actual test / benchmark / runtime evidence
+workflow state   designated workflow artifacts
+```
+
+Observed evidence overrides stale documentation; stale documentation should then be corrected.
+
+## 10. Compatibility Decision
+
+The repository is still first-version and has no documented external dependency on the old peer skill
+names. The v2 migration therefore removes them instead of adding wrappers that would remain alternate
+implicit entry points. If compatibility becomes necessary later, wrappers may only pin Primary Intent
+and must delegate all procedure to this canonical skill.

@@ -1,196 +1,108 @@
 # Engineering Workflows for Codex
 
-A small workflow framework for engineering tasks.
-
-The project separates two different decisions:
-
-1. **What kind of engineering task is this?**
-2. **How much process does that task actually need?**
-
-The first implemented workflow is `adaptive-development`, which classifies development work as:
+A single opt-in Codex skill for mixed, high-risk, and evidence-sensitive engineering work. It routes
+the current result to the right method and applies only as much process as the task needs.
 
 ```text
-SMALL
-MEDIUM
-LARGE
-VERY_LARGE
+User goal + repository constraints
+    -> engineering-workflow
+    -> Primary Intent
+    -> one selected workflow
+    -> workflow-specific strategy
+    -> execution and verification
+    -> optional transition when the objective changes
 ```
 
-Development complexity is evaluated using:
+The six primary intents are Development, Testing, Debugging, Performance, Investigation, and Review.
+Users normally describe the outcome they want; they do not need to choose a workflow, scale, artifact,
+or number of agents.
 
-```text
-Scope + Uncertainty + Risk + Parallelism
-```
+The skill uses progressive loading and tested context budgets: it loads one intent workflow and, when
+needed, one scale/strategy reference—not the whole library. Routine low-risk work can use native
+Codex directly and pays no selected-skill body cost.
 
-and is re-evaluated after exploration, after planning/design, at major phase boundaries, before final verification, and when material complexity changes are discovered.
+## Why Use It
 
-## Architecture
+- prove an unknown cause before repairing it;
+- keep implementation verification inside Development instead of multiplying workflows;
+- never count unavailable validation as PASS;
+- require controlled, repeated evidence before performance claims;
+- keep review read-only unless fixes are explicitly requested;
+- avoid plans, handoffs, and subagents when they do not improve reliability.
 
-```text
-User Task
-   │
-   ▼
-Repository constraints
-AGENTS.md / AGENTS.override.md
-   │
-   ▼
-Primary Intent
-   │
-   ├── Development  ──> adaptive-development
-   ├── Testing      ──> adaptive-testing          [planned]
-   ├── Debugging    ──> systematic-debugging     [planned]
-   ├── Performance  ──> performance-benchmark    [planned]
-   ├── Investigation──> code-investigation       [planned]
-   └── Review       ──> code-review              [planned]
-                           │
-                           ▼
-                    workflow-specific process
-```
+## One-minute Installation
 
-The eventual `engineering-router` will only choose the primary workflow and coordinate transitions. It should not duplicate the detailed rules of the individual workflows.
-
-## Current Status
-
-```text
-skills/
-└── adaptive-development/       READY
-
-proposals/
-├── adaptive-testing.md         DESIGN ONLY
-├── systematic-debugging.md     DESIGN ONLY
-├── performance-benchmark.md    DESIGN ONLY
-├── code-investigation.md       DESIGN ONLY
-├── code-review.md              DESIGN ONLY
-└── engineering-router.md       DESIGN ONLY
-```
-
-Only directories under `skills/` are intended to be installed as Codex skills.
-
-Files under `proposals/` are intentionally not executable skills. They define boundaries and expected artifacts so that future skills can be implemented without prematurely fixing unstable behavior.
-
-## Project Layout
-
-```text
-engineering-workflows/
-├── README.md
-├── AGENTS.md
-├── skills/
-│   └── adaptive-development/
-│       ├── SKILL.md
-│       ├── README.md
-│       └── references/
-│           ├── small.md
-│           ├── medium.md
-│           ├── large.md
-│           └── very-large.md
-├── docs/
-│   ├── architecture.md
-│   ├── workflow-contract.md
-│   └── roadmap.md
-└── proposals/
-    ├── adaptive-testing.md
-    ├── systematic-debugging.md
-    ├── performance-benchmark.md
-    ├── code-investigation.md
-    ├── code-review.md
-    └── engineering-router.md
-```
-
-## Core Principle: Primary Intent First
-
-Classify a task by its **current primary objective**, not by whether code may eventually be changed.
-
-Examples:
-
-```text
-"Implement a new scheduler option."
-=> Development
-
-"Verify this kernel for BF16 and FP16."
-=> Testing
-
-"vLLM crashes during REGISTER_KV_CACHE; find and fix it."
-=> Debugging
-
-"Compare native vLLM and LMCache TTFT/throughput."
-=> Performance
-
-"Trace how Scheduler allocates KV blocks."
-=> Investigation
-
-"Review this PR for correctness and compatibility."
-=> Review
-```
-
-A task may transition between workflows when its objective changes.
-
-Example:
-
-```text
-Testing
-  │
-  └── failure discovered
-          ▼
-      Debugging
-          │
-          └── root cause confirmed
-                  ▼
-              Development
-                  │
-                  └── fix completed
-                          ▼
-                       Testing
-```
-
-This is **workflow chaining**. It is preferable to making one giant skill responsible for every engineering activity.
-
-## Installation
-
-Install only the skills you want Codex to discover.
-
-Repository scoped:
+Repository scope:
 
 ```bash
 mkdir -p <repo>/.agents/skills
-cp -r skills/adaptive-development <repo>/.agents/skills/
+cp -r skills/engineering-workflow <repo>/.agents/skills/
 ```
 
-User scoped:
+User scope:
 
 ```bash
 mkdir -p "$HOME/.agents/skills"
-cp -r skills/adaptive-development "$HOME/.agents/skills/"
+cp -r skills/engineering-workflow "$HOME/.agents/skills/"
 ```
 
-Do not copy `proposals/` into `.agents/skills/`.
+Install only `engineering-workflow`; the six workflows are internal progressive references, not
+separate skills.
 
-## Usage Today
-
-Explicit invocation:
+## One-minute Usage
 
 ```text
-$adaptive-development
+$engineering-workflow
 
-Goal:
-Implement <requirement>.
+LMCache 的 REGISTER_KV_CACHE 在 DCU 环境报 HIP error，
+请找到根因，修复，并补充回归测试。
 ```
 
-Or use normal development language and allow Codex to match the skill.
+The framework starts with Debugging, transitions to Development after root-cause proof, then uses
+Testing for regression verification.
 
-Project-specific engineering rules still belong in the target repository's `AGENTS.md`. This project defines reusable workflows; it does not replace repository-specific instructions.
+The skill is explicit-invocation by default. This avoids broad automatic activation on routine edits
+and makes its context cost a user choice.
 
-## Evolution Rule
+## Measured Scope
 
-A new workflow moves through:
+On a frozen eight-case holdout, the same inherited Codex configuration scored 35/48 (72.9%) without
+the skill body and 43/48 (89.6%) with it: eight additional routing and evidence-discipline checks.
+This is not a claim of general coding superiority. See `tests/evals/` for the frozen rubric hash, raw
+JSONL, scorer, exploratory run, and limitations; the host did not expose a verifiable public model
+slug.
+
+## Layout
 
 ```text
-idea
-  -> proposals/<workflow>.md
-  -> workflow boundary stabilizes
-  -> implement SKILL.md + references
-  -> validate on real tasks
-  -> move to skills/<workflow>/
-  -> optionally teach engineering-router about it
+engineering-workflows/
+├── AGENTS.md
+├── README.md
+├── docs/
+│   ├── architecture.md
+│   ├── roadmap.md
+│   ├── usage.md
+│   └── workflow-contract.md
+├── skills/
+│   └── engineering-workflow/
+│       ├── SKILL.md
+│       ├── agents/openai.yaml
+│       └── references/
+│           ├── development/
+│           ├── testing/
+│           ├── debugging/
+│           ├── performance/
+│           ├── investigation/
+│           └── review/
+└── tests/
 ```
 
-Do not implement the top-level router before the underlying workflows are stable enough to route to.
+## Documentation
+
+- [完整使用指南](docs/usage.md)
+- [架构设计](docs/architecture.md)
+- [Workflow 作者契约](docs/workflow-contract.md)
+- [路线图](docs/roadmap.md)
+
+Repository-specific build, test, style, and platform rules still belong in the target repository's
+`AGENTS.md`; this skill provides task-execution methodology.
