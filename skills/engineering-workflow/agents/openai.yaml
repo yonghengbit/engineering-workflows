@@ -1,0 +1,4 @@
+interface:
+  display_name: "Engineering Workflow"
+  short_description: "Route and execute engineering work by primary intent"
+  default_prompt: "Use $engineering-workflow to complete this engineering task with the appropriate workflow."

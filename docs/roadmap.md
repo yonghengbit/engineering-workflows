@@ -1,145 +1,45 @@
 # Roadmap
 
-The framework should grow from concrete workflows upward, not from a generic router downward.
+## v1 — Concrete Workflows
 
-## Phase 1 — Development
+Status: **completed**
+
+The first version established reusable procedure for:
+
+- four-scale adaptive Development;
+- QUICK / STRUCTURED / VALIDATION Testing;
+- evidence-driven Debugging;
+- controlled Performance benchmarking;
+- evidence-labelled Investigation;
+- findings-first Review;
+- thin primary-intent routing.
+
+## v2 — Canonical Engineering Workflow
 
 Status: **implemented**
 
-```text
-skills/adaptive-development/
-```
-
-Capabilities:
-
-- four-scale development classification;
-- controlled re-evaluation;
-- scale-specific planning artifacts;
-- Very Large phase decomposition;
-- optional multi-agent boundaries.
-
-## Phase 2 — Testing and Debugging
-
-Status: **next**
-
-Implement:
+The peer skills were consolidated into:
 
 ```text
-adaptive-testing
-systematic-debugging
+skills/engineering-workflow/
 ```
 
-Why first:
+Completed properties:
 
-These two workflows complete the normal correctness loop around Development:
+- one user-facing and installable skill;
+- lightweight Primary Intent routing in the main agent;
+- six progressively loaded workflow references;
+- second-stage loading for Development and Testing strategies;
+- a shared transition payload and supporting-activity rule;
+- proportional artifacts;
+- dynamic, task-derived subagent decisions;
+- clean removal of old peer skills without duplicate wrappers;
+- user guide and structural/scenario validation.
 
-```text
-Development -> Testing
-Testing failure -> Debugging
-Debugging root cause -> Development
-Development fix -> Testing
-```
+## Ongoing Validation
 
-### adaptive-testing target
-
-Likely strategies:
-
-```text
-QUICK
-STRUCTURED
-VALIDATION
-```
-
-Expected artifacts:
-
-```text
-QUICK:
-  none
-
-STRUCTURED:
-  TEST_PLAN.md
-  TEST_REPORT.md
-
-VALIDATION:
-  VALIDATION_PLAN.md
-  results/*
-  VALIDATION_REPORT.md
-```
-
-### systematic-debugging target
-
-Core loop:
-
-```text
-Symptom
- -> Reproduce
- -> Evidence
- -> Hypotheses
- -> Minimal discriminating experiment
- -> Root cause
- -> Fix handoff
- -> Regression verification
-```
-
-Use a persistent `DEBUG.md` only for non-trivial investigations.
-
-## Phase 3 — Performance
-
-Status: planned
-
-Implement:
-
-```text
-performance-benchmark
-```
-
-Key properties:
-
-- explicit hypothesis;
-- stable baseline;
-- controlled variables;
-- environment capture;
-- warmup and repetitions;
-- correctness before speed;
-- raw results preserved;
-- conclusion tied to measured evidence.
-
-## Phase 4 — Investigation and Review
-
-Status: planned
-
-Implement:
-
-```text
-code-investigation
-code-review
-```
-
-These workflows are useful, but they do not need to block the core Development/Testing/Debugging loop.
-
-## Phase 5 — Engineering Router
-
-Status: intentionally deferred
-
-Implement only after the underlying workflows have been validated on real tasks.
-
-Responsibilities:
-
-```text
-identify primary intent
- -> choose one workflow
- -> coordinate explicit transitions
-```
-
-The router must remain thin and must not duplicate child workflow rules.
-
-## Promotion Criteria
-
-A proposal can move from `proposals/` to `skills/` when:
-
-- its primary intent is unambiguous;
-- its non-goals are explicit;
-- artifact rules are stable;
-- it has a usable re-evaluation model;
-- workflow transitions are defined;
-- it has been tested against representative real tasks.
+- forward-test routing against additional real repositories and ambiguous prompts;
+- refine precedence only from observed routing failures;
+- add a compatibility wrapper only if a real external dependency is documented;
+- introduce new primary intents through `docs/workflow-contract.md`;
+- keep the top-level router thin as child workflows evolve.
