@@ -176,14 +176,19 @@ class WorkflowStructureTests(unittest.TestCase):
 
     def test_user_and_author_docs_match_canonical_entry(self) -> None:
         readme = (ROOT / "README.md").read_text(encoding="utf-8")
+        english_readme = (ROOT / "README.en.md").read_text(encoding="utf-8")
         usage = (ROOT / "docs" / "usage.md").read_text(encoding="utf-8")
         contract = (ROOT / "docs" / "workflow-contract.md").read_text(
             encoding="utf-8"
         )
         self.assertIn("docs/usage.md", readme)
         self.assertIn("# Engineering Workflows\n", readme)
+        self.assertIn("**简体中文** | [English](README.en.md)", readme)
+        self.assertIn("[简体中文](README.md) | **English**", english_readme)
+        self.assertIn("One entrypoint. Six workflows.", english_readme)
         self.assertNotIn("# Engineering Workflows for Codex", readme)
-        self.assertIn("open Agent Skills", readme)
+        self.assertIn("开放的 Agent Skills", readme)
+        self.assertIn("open Agent Skills", english_readme)
         self.assertIn("$engineering-workflow", usage)
         self.assertIn("/engineering-workflow", usage)
         self.assertIn(".agents/skills", usage)
@@ -201,7 +206,11 @@ class WorkflowStructureTests(unittest.TestCase):
             self.assertIn(intent, usage)
 
     def test_local_markdown_links_resolve(self) -> None:
-        markdown_files = [ROOT / "README.md", *sorted((ROOT / "docs").glob("*.md"))]
+        markdown_files = [
+            ROOT / "README.md",
+            ROOT / "README.en.md",
+            *sorted((ROOT / "docs").glob("*.md")),
+        ]
         pattern = re.compile(r"\[[^\]]+\]\(([^)]+\.md)(?:#[^)]+)?\)")
         for source in markdown_files:
             text = source.read_text(encoding="utf-8")
@@ -214,6 +223,7 @@ class WorkflowStructureTests(unittest.TestCase):
     def test_active_text_has_no_trailing_whitespace(self) -> None:
         text_files = [
             ROOT / "README.md",
+            ROOT / "README.en.md",
             ROOT / "AGENTS.md",
             *sorted((ROOT / "docs").rglob("*.md")),
             *sorted(SKILL.rglob("*.md")),
