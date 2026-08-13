@@ -321,7 +321,7 @@ class WorkflowStructureTests(unittest.TestCase):
         self.assertEqual({f"C{index}" for index in range(1, 9)}, set(rubric))
         self.assertTrue(all(len(checks) == 6 for checks in rubric.values()))
         self.assertIn(
-            "A1B61E0AD1E9BDC615751D707593501841A85C92726126A6E990267FB7734652",
+            "BF77080CF79DC4719EAC94271F36FC205418CBE454897F52369366CE6DC85471",
             (comparative / "protocol.md").read_text(encoding="utf-8"),
         )
         completed = subprocess.run(
@@ -366,7 +366,7 @@ class WorkflowStructureTests(unittest.TestCase):
                 self.assertEqual(48, result["total"])
                 self.assertEqual(expected_proxy, result["combined_token_proxy"])
                 self.assertEqual(
-                    "a1b61e0ad1e9bdc615751d707593501841a85c92726126a6e990267fb7734652",
+                    "bf77080cf79dc4719eac94271f36fc205418cbe454897f52369366ce6dc85471",
                     result["rubric_sha256"],
                 )
 

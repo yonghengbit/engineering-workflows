@@ -4,105 +4,129 @@
 
 # Engineering Workflows
 
-**One entrypoint. Six workflows. Evidence-driven engineering.**
+**One entrypoint. Six workflows. Teach your coding agent when to move fast—and when rigor is
+non-negotiable.**
 
-A goal-first workflow for AI coding agents that chooses the right amount of engineering process,
-loads only what it needs, and treats verification as part of the result—not an afterthought.
+An engineering decision layer for Codex, Claude Code, and other Agent Skills-compatible tools. It
+selects the right workflow, loads only the rules the current task needs, and finishes with evidence.
 
 [简体中文](README.md) | **English**
 
 [![Agent Skills](https://img.shields.io/badge/Agent_Skills-open_standard-111827?style=flat-square)](https://agentskills.io)
-[![Workflows](https://img.shields.io/badge/workflows-6-6366F1?style=flat-square)](#six-workflows-one-interface)
-[![Progressive Loading](https://img.shields.io/badge/context-progressive_loading-0EA5E9?style=flat-square)](#why-this-exists)
-[![Explicit First](https://img.shields.io/badge/invocation-explicit_first-8B5CF6?style=flat-square)](#one-minute-usage)
-[![Holdout](https://img.shields.io/badge/holdout-43%2F48_%2889.6%25%29-10B981?style=flat-square)](#measured-scope)
+[![Workflows](https://img.shields.io/badge/workflows-6-6366F1?style=flat-square)](#how-it-works)
+[![Planning](https://img.shields.io/badge/planning-39%2F48_%2881.2%25%29-10B981?style=flat-square)](#start-with-the-results)
+[![Context](https://img.shields.io/badge/context-52.4%25_less_vs_Superpowers-0EA5E9?style=flat-square)](#start-with-the-results)
 
-[Why it exists](#why-this-exists) ·
+[Why](#coding-agents-have-capability-but-not-always-engineering-judgment) ·
+[Evidence](#start-with-the-results) ·
+[When to use it](#when-it-is-worth-using) ·
 [Install](#one-minute-installation) ·
 [Use](#one-minute-usage) ·
-[Architecture](docs/architecture.md) ·
 [Full guide](docs/usage.md)
 
 </div>
 
 ---
 
-## Why this exists
+## Coding agents have capability, but not always engineering judgment
 
-Engineering tasks do not all need the same ceremony. A one-line fix should not pay the process cost of
-a cross-subsystem redesign, while a performance claim or unknown crash should not be accepted without
-controlled evidence.
+A native agent can write code, yet it may not choose the right engineering process for each task:
 
-Engineering Workflows gives a compatible coding agent one entrypoint and lets the current objective
-determine the method:
+- a small change can be over-planned, wasting context and time;
+- an unknown crash can receive a speculative fix before its cause is proven;
+- an unavailable test can be described ambiguously as successful validation;
+- a performance claim can lack a baseline, repetition, or controlled variables;
+- a read-only review can silently turn into unauthorized implementation.
 
-| Principle | What it means |
-|---|---|
-| **Goal-first routing** | Describe the result you want; the framework selects the primary engineering intent. |
-| **Proportional process** | SMALL work stays light; larger or higher-risk work earns planning, artifacts, or subagents only when useful. |
-| **Evidence-driven completion** | Tests, benchmarks, root-cause proof, and review findings are treated as evidence with explicit PASS / FAIL / BLOCKED semantics. |
+Engineering Workflows does not replace an agent's coding ability. It supplies the missing decision
+layer: identify the current objective, choose proportional process, and require evidence that matches
+the conclusion.
 
-### Six workflows, one interface
+> Keep small work light. Give risky work enough rigor. Say `BLOCKED` when verification is impossible
+> instead of pretending the task is complete.
 
-| Intent | Primary question |
-|---|---|
-| **Development** | What software behavior should be intentionally changed? |
-| **Testing** | Does the system satisfy explicit required criteria? |
-| **Debugging** | What causes this unexpected behavior? |
-| **Performance** | How fast is it, why, and under what controlled conditions? |
-| **Investigation** | How does the existing system actually work? |
-| **Review** | What problems or risks exist in this existing change or design? |
+## Start with the results
 
-Invoke one skill using the host's syntax:
+The claims are backed by a frozen task set, rubric, raw outputs, source hashes, and a reproducible
+scorer stored in this repository.
 
-```text
-Codex CLI / IDE  $engineering-workflow
-ChatGPT          @engineering-workflow
-Claude Code      /engineering-workflow
-```
+| Condition | Planning checks | Loaded-input proxy | Output proxy | Combined proxy |
+|---|---:|---:|---:|---:|
+| Native agent | 30/48 (62.5%) | **0** | **2,751** | **2,751** |
+| **Engineering Workflows** | **39/48 (81.2%)** | 6,552 | 2,851 | **9,403** |
+| Superpowers v6.1.1 | 36/48 (75.0%) | 15,338 | 4,428 | 19,766 |
 
-The framework handles routing, workflow-specific strategy, verification depth, optional artifacts,
-and objective transitions.
+![Three-way planning quality comparison](assets/benchmark-planning-quality.svg)
 
----
+![Three-way token proxy comparison](assets/benchmark-token-proxy.svg)
 
-## What it is
+Across this frozen set of eight planning-only cases, Engineering Workflows passed three more checks
+than Superpowers while using **57.3% less loaded-input proxy** and **52.4% less combined proxy**.
+The native agent remained cheapest, so the claim is not “a skill always saves tokens.” It is:
+**when engineering discipline is warranted, get stronger planning with less workflow context.**
 
-A portable Agent Skill for mixed, high-risk, and evidence-sensitive engineering work. It routes the
-current result to the right method and applies only as much process as the task needs.
+The token figures are `ceil(normalized characters / 4)`, not billed tokens. Each condition ran once,
+and this benchmark does not measure real coding success. Read the [full report](tests/evals/comparative/report.md),
+[frozen protocol](tests/evals/comparative/protocol.md), and [raw summary](tests/evals/comparative/results/summary.json).
+
+## Why Engineering Workflows
+
+| | Native agent | Engineering Workflows | Heavy multi-skill process |
+|---|---|---|---|
+| Process choice | Depends on the prompt and model habits | **Explicit routing by current objective** | Often forces a prescribed sequence |
+| Context cost | Lowest | **One workflow plus an optional strategy, loaded on demand** | May load several skills in sequence |
+| Small tasks | Fast, but discipline varies | **Stays light; no mandatory plan or subagent** | Can carry fixed ceremony cost |
+| High-risk tasks | Users must supply constraints | **Explicit gates for causes, validation, and performance evidence** | Rigorous, but potentially heavier |
+| Mixed objectives | Activities can blur together | **Transitions only when the primary deliverable changes** | Can become a multi-process chain |
+| Completion semantics | Depends on agent wording | **Auditable PASS / FAIL / BLOCKED** | Depends on each skill's contract |
+
+This is not a longer generic prompt and it does not force a plan for every request. The entrypoint only
+routes. Detailed rules load progressively. Supporting activity does not cause unnecessary workflow
+switches, and plans, artifacts, or subagents are used only when they improve reliability.
+
+## When it is worth using
+
+Explicitly invoke it for:
+
+- unknown failures, concurrency problems, and evidence-poor debugging;
+- cross-module development, migrations, and high-risk behavior changes;
+- release gates, acceptance testing, and validation with potentially unavailable infrastructure;
+- performance benchmarks, regression isolation, and reproducible optimization claims;
+- read-only investigation or review, and mixed tasks whose primary objective may change.
+
+Use the native agent directly for:
+
+- low-risk routine changes with an obvious intent and validation path;
+- explanation, rewriting, or simple mechanical operations.
+
+That is why the project is **explicit-first**: workflow context is paid only when it has a reason to
+improve the result.
+
+## How it works
 
 ```text
 User goal + repository constraints
-    -> engineering-workflow
-    -> Primary Intent
-    -> one selected workflow
-    -> workflow-specific strategy
+    -> engineering-workflow router
+    -> one primary intent
+    -> one workflow
+    -> scale / strategy loaded when needed
     -> execution and verification
-    -> optional transition when the objective changes
+    -> transition only when the primary objective changes
 ```
 
-The six primary intents are Development, Testing, Debugging, Performance, Investigation, and Review.
-Users normally describe the outcome they want; they do not need to choose a workflow, scale, artifact,
-or number of agents.
+| Intent | Question it answers |
+|---|---|
+| **Development** | What software behavior should be intentionally changed? |
+| **Testing** | Does the system satisfy explicit acceptance criteria? |
+| **Debugging** | What causes the unexpected behavior? |
+| **Performance** | How fast is it, why, and under what controlled conditions? |
+| **Investigation** | How does the existing system actually work? |
+| **Review** | What problems or risks exist in the current change or design? |
 
-The skill uses progressive loading and tested context budgets: it loads one intent workflow and, when
-needed, one scale/strategy reference—not the whole library. Routine low-risk work can use the host
-agent directly and pays no selected-skill body cost.
+The core skill follows the open Agent Skills format: one `SKILL.md` entrypoint and progressively loaded
+references. `agents/openai.yaml` is an optional OpenAI integration; other compatible hosts can ignore it.
 
-The core skill uses the open Agent Skills format: a `SKILL.md` entrypoint plus progressively loaded
-references. `agents/openai.yaml` is an optional OpenAI integration for UI metadata and invocation
-policy; non-OpenAI hosts can ignore it.
-
-## Why Use It
-
-- prove an unknown cause before repairing it;
-- keep implementation verification inside Development instead of multiplying workflows;
-- never count unavailable validation as PASS;
-- require controlled, repeated evidence before performance claims;
-- keep review read-only unless fixes are explicitly requested;
-- avoid plans, handoffs, and subagents when they do not improve reliability.
-
-## One-minute Installation
+## One-minute installation
 
 Codex repository scope:
 
@@ -118,11 +142,19 @@ mkdir -p <repo>/.claude/skills
 cp -r skills/engineering-workflow <repo>/.claude/skills/
 ```
 
-Install only `engineering-workflow`; the six workflows are internal progressive references, not
-separate skills. User-scope paths and other compatible hosts are covered in the
+Install only `engineering-workflow`. The six workflows are internal references, not six independent
+skills. User-scope paths, Windows commands, and other compatible hosts are covered in the
 [full installation guide](docs/usage.md#2-安装).
 
-## One-minute Usage
+## One-minute usage
+
+Invoke the skill using the host's syntax, then describe the result you want:
+
+```text
+Codex CLI / IDE  $engineering-workflow
+ChatGPT          @engineering-workflow
+Claude Code      /engineering-workflow
+```
 
 ```text
 $engineering-workflow
@@ -131,64 +163,18 @@ LMCache's REGISTER_KV_CACHE fails with a HIP error on DCU.
 Find the root cause, fix it, and add a regression test.
 ```
 
-The framework starts with Debugging, transitions to Development after root-cause proof, then uses
-Testing for regression verification.
+The framework starts in Debugging and transitions to Development after the cause is proven. It moves
+to Testing only if the primary deliverable becomes an independent acceptance conclusion. You describe
+the outcome; the framework chooses the workflow, scale, artifacts, and agent count.
 
-The skill is explicit-first. OpenAI hosts enforce this through `agents/openai.yaml`; other hosts use
-their own invocation policy, so explicit selection is the portable behavior.
-
-## Measured Scope
-
-On a frozen eight-case holdout, the same inherited Codex configuration scored 35/48 (72.9%) without
-the skill body and 43/48 (89.6%) with it: eight additional routing and evidence-discipline checks.
-This is not a claim of general coding superiority. See `tests/evals/` for the frozen rubric hash, raw
-JSONL, scorer, exploratory run, and limitations; the host did not expose a verifiable public model
-slug.
-
-A new three-way planning comparison covers the native agent, Engineering Workflows, and Superpowers
-v6.1.1. On the same frozen 48-check rubric, this project scored **39/48 (81.2%)** versus Superpowers at
-36/48 (75.0%), with 57.3% less loaded-input proxy and 52.4% less combined input/output proxy. The
-native agent was cheapest but scored 30/48 (62.5%). These are single-run, planning-only character
-proxies—not billed tokens or coding success rates. See the [full comparative report](tests/evals/comparative/report.md)
-and raw JSONL.
-
-![Three-way planning quality comparison](assets/benchmark-planning-quality.svg)
-
-![Three-way token proxy comparison](assets/benchmark-token-proxy.svg)
-
-## Layout
-
-```text
-engineering-workflows/
-├── AGENTS.md
-├── README.md
-├── README.en.md
-├── docs/
-│   ├── architecture.md
-│   ├── roadmap.md
-│   ├── usage.md
-│   └── workflow-contract.md
-├── skills/
-│   └── engineering-workflow/
-│       ├── SKILL.md
-│       ├── agents/openai.yaml
-│       └── references/
-│           ├── development/
-│           ├── testing/
-│           ├── debugging/
-│           ├── performance/
-│           ├── investigation/
-│           └── review/
-└── tests/
-```
-
-## Documentation
+## Documentation and repository
 
 - [Full usage guide (Chinese)](docs/usage.md)
+- [Comparative benchmark and reproduction](tests/evals/comparative/README.md)
 - [Architecture](docs/architecture.md)
 - [Workflow author contract](docs/workflow-contract.md)
 - [Roadmap](docs/roadmap.md)
 
 Repository-specific build, test, style, and platform rules still belong in the target repository's
-host instruction files, such as `AGENTS.md` or `CLAUDE.md`; this skill provides task-execution
-methodology.
+`AGENTS.md`, `CLAUDE.md`, or equivalent host instructions. This skill provides reusable execution
+methodology only.

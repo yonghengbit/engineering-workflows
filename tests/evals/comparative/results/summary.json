@@ -1,7 +1,7 @@
 {
   "date": "2026-08-13",
   "harness": "fresh subagents with the same inherited configuration; public model slug and exact reasoning setting unavailable",
-  "rubric_sha256": "a1b61e0ad1e9bdc615751d707593501841a85c92726126a6e990267fb7734652",
+  "rubric_sha256": "bf77080cf79dc4719eac94271f36fc205418cbe454897f52369366ce6dc85471",
   "token_proxy": "ceil(normalized UTF-8 characters / 4); not billed or tokenizer-exact tokens",
   "conditions": {
     "native": {
