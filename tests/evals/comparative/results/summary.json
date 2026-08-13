@@ -1,0 +1,32 @@
+{
+  "date": "2026-08-13",
+  "harness": "fresh subagents with the same inherited configuration; public model slug and exact reasoning setting unavailable",
+  "rubric_sha256": "a1b61e0ad1e9bdc615751d707593501841a85c92726126a6e990267fb7734652",
+  "token_proxy": "ceil(normalized UTF-8 characters / 4); not billed or tokenizer-exact tokens",
+  "conditions": {
+    "native": {
+      "passed": 30,
+      "total": 48,
+      "score_percent": 62.5,
+      "loaded_token_proxy": 0,
+      "output_token_proxy": 2751,
+      "combined_token_proxy": 2751
+    },
+    "engineering-workflow": {
+      "passed": 39,
+      "total": 48,
+      "score_percent": 81.2,
+      "loaded_token_proxy": 6552,
+      "output_token_proxy": 2851,
+      "combined_token_proxy": 9403
+    },
+    "superpowers-v6.1.1": {
+      "passed": 36,
+      "total": 48,
+      "score_percent": 75.0,
+      "loaded_token_proxy": 15338,
+      "output_token_proxy": 4428,
+      "combined_token_proxy": 19766
+    }
+  }
+}

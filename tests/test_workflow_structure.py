@@ -314,6 +314,72 @@ class WorkflowStructureTests(unittest.TestCase):
         )
         self.assertEqual(8, holdout_scores["treatment"]["passed"] - holdout_scores["baseline"]["passed"])
 
+    def test_comparative_benchmark_is_frozen_and_runnable(self) -> None:
+        comparative = ROOT / "tests" / "evals" / "comparative"
+        rubric_path = comparative / "rubric.json"
+        rubric = json.loads(rubric_path.read_text(encoding="utf-8"))
+        self.assertEqual({f"C{index}" for index in range(1, 9)}, set(rubric))
+        self.assertTrue(all(len(checks) == 6 for checks in rubric.values()))
+        self.assertIn(
+            "A1B61E0AD1E9BDC615751D707593501841A85C92726126A6E990267FB7734652",
+            (comparative / "protocol.md").read_text(encoding="utf-8"),
+        )
+        completed = subprocess.run(
+            [sys.executable, str(comparative / "score_comparison.py"), "--help"],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        self.assertIn("--skill-root", completed.stdout)
+        self.assertIn("--source-manifest", completed.stdout)
+
+        conditions = {
+            "native": (
+                comparative / "results" / "native-inherited-agent-2026-08-13.jsonl",
+                None,
+                30,
+                2_751,
+            ),
+            "engineering-workflow": (
+                comparative / "results" / "engineering-workflow-inherited-agent-2026-08-13.jsonl",
+                comparative / "manifests" / "engineering-workflow.json",
+                39,
+                9_403,
+            ),
+            "superpowers": (
+                comparative / "results" / "superpowers-v6.1.1-inherited-agent-2026-08-13.jsonl",
+                comparative / "manifests" / "superpowers-v6.1.1.json",
+                36,
+                19_766,
+            ),
+        }
+        for name, (run, manifest, expected_passed, expected_proxy) in conditions.items():
+            command = [sys.executable, str(comparative / "score_comparison.py"), str(run)]
+            if manifest:
+                command.extend(["--source-manifest", str(manifest)])
+            if name == "engineering-workflow":
+                command.extend(["--skill-root", str(SKILL)])
+            scored = subprocess.run(command, check=True, capture_output=True, text=True)
+            result = json.loads(scored.stdout)
+            with self.subTest(condition=name):
+                self.assertEqual(expected_passed, result["passed"])
+                self.assertEqual(48, result["total"])
+                self.assertEqual(expected_proxy, result["combined_token_proxy"])
+                self.assertEqual(
+                    "a1b61e0ad1e9bdc615751d707593501841a85c92726126a6e990267fb7734652",
+                    result["rubric_sha256"],
+                )
+
+        readme = (ROOT / "README.md").read_text(encoding="utf-8")
+        for chart_name in (
+            "benchmark-planning-quality.svg",
+            "benchmark-token-proxy.svg",
+        ):
+            chart = ROOT / "assets" / chart_name
+            with self.subTest(chart=chart_name):
+                self.assertTrue(chart.is_file())
+                self.assertIn(f"assets/{chart_name}", readme)
+
 
 if __name__ == "__main__":
     unittest.main()

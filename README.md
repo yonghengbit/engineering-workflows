@@ -138,6 +138,16 @@ LMCache 的 REGISTER_KV_CACHE 在 DCU 环境报 HIP error，
 这不代表普遍的编码能力提升。冻结 rubric hash、原始 JSONL、评分器、探索性结果和限制说明
 均保存在 `tests/evals/`；测试宿主未提供可验证的公开模型 slug。
 
+新的三方规划对照包含 Native Agent、Engineering Workflows 与 Superpowers v6.1.1。在同一冻结
+的 48 项 rubric 上，本项目得到 **39/48（81.2%）**，Superpowers 得到 36/48（75.0%）；本项目
+的加载输入 token 代理少 57.3%，输入与输出合计代理少 52.4%。Native Agent 成本最低，但得到
+30/48（62.5%）。这些是单次、planning-only、字符代理结果，不是实际计费 token 或编码成功率。
+参阅[完整对照报告](tests/evals/comparative/report.md)和原始 JSONL。
+
+![三方规划质量对比](assets/benchmark-planning-quality.svg)
+
+![三方 token 代理开销对比](assets/benchmark-token-proxy.svg)
+
 ## 仓库结构
 
 ```text

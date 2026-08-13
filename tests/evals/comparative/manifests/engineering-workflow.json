@@ -1,0 +1,17 @@
+{
+  "source": "https://github.com/yonghengbit/engineering-workflows",
+  "commit": "616fe61c306218cbff67bd0474f09151e96c3867",
+  "normalization": "UTF-8 text with CRLF replaced by LF; character count after normalization",
+  "files": {
+    "SKILL.md": {"characters": 4153, "sha256": "53a2688e6df90ea759e93e29c373ab4606f0177e74a5ab5611f45b2b5d340497"},
+    "references/debugging/workflow.md": {"characters": 3915, "sha256": "73903ad8f2c941f42746ea4986d0d5177ce8615b2ed116537e221706418348da"},
+    "references/development/large.md": {"characters": 1558, "sha256": "ef019918d41e2ed4a1a461cffaf1b7b4f90ba30e3188eac65bfde816b1cd9359"},
+    "references/development/small.md": {"characters": 770, "sha256": "29ada85587b89cb56b5849acea1c7133f8113334a76685701e4a92720f30a1d2"},
+    "references/development/workflow.md": {"characters": 2576, "sha256": "b487da64603605eca0cedee2bd4b102b8876fe2880b907f5e89ddc63e160ef26"},
+    "references/investigation/workflow.md": {"characters": 2661, "sha256": "749e9f25be2ecbb877f7b0c6a5e020ad11f6bc2921be342feaed11ad8d4681ad"},
+    "references/performance/workflow.md": {"characters": 4064, "sha256": "d500552574072014148d1ee8de45a9df0d82bc531402f0ccc1a8a11c0dddd603"},
+    "references/review/workflow.md": {"characters": 3170, "sha256": "afe4bd4ccbb167027d090561fe908204a6945f998efe94cef863dad5b8c26c53"},
+    "references/testing/quick.md": {"characters": 616, "sha256": "3402bbd049e689d30af5d6cfa40b5073c787d2314ce907d4f74d87a18ed90f99"},
+    "references/testing/workflow.md": {"characters": 2724, "sha256": "6791d26a7c1d4fce7ae8146e24f59f01fdbc3b3c6133ef5287b3b08b384640db"}
+  }
+}

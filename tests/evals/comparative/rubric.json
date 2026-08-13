@@ -1,0 +1,66 @@
+{
+  "C1": [
+    ["minimal scope", "approach", "small|minimal|local|narrow"],
+    ["no heavyweight artifact", "artifacts", "^\\[\\]$|none|no durable"],
+    ["no subagent", "agents", "^no\\b|none|single agent"],
+    ["compatibility protected", "evidence", "byte|omitted|default|unchanged"],
+    ["focused verification", "evidence", "focused|narrow|regression"],
+    ["stop on verified result", "stop_conditions", "pass|verified|regression"]
+  ],
+  "C2": [
+    ["validation objective", "objective", "test|valid|release|gate"],
+    ["blocked is explicit", "stop_conditions", "blocked|unreachable|unavailable"],
+    ["blocked is not pass", "stop_conditions", "not.*pass|no pass|cannot.*pass|blocked"],
+    ["no product mutation", "approach", "no.*change|read.only|do not.*modify|without.*modif"],
+    ["exact execution evidence", "evidence", "command|output|environment|revision"],
+    ["no speculative diagnosis", "transitions", "^\\[\\]$|no.*debug|only if.*request"]
+  ],
+  "C3": [
+    ["root cause first", "approach", "root cause|mechanism|cause.*before|before.*fix"],
+    ["controlled reproduction", "evidence", "repro|concurr|load|timing"],
+    ["competing hypotheses", "evidence", "hypoth|discriminat|counterfactual"],
+    ["proof before repair", "transitions", "proof|proven|confirm|root cause"],
+    ["regression verification", "evidence", "regression|repeated|stress"],
+    ["shared state not blindly parallel", "agents", "no|shared|central|only.*independent"]
+  ],
+  "C4": [
+    ["review objective", "objective", "review|risk|finding"],
+    ["read-only approach", "approach", "read.only|no.*edit|without.*chang|leave.*unchanged"],
+    ["no implementation transition", "transitions", "^\\[\\]$|no.*implement|only if.*request"],
+    ["findings-first evidence", "evidence", "finding|location|trigger|impact|severity"],
+    ["no forced artifact", "artifacts", "^\\[\\]$|none|response only"],
+    ["stop without mutation", "stop_conditions", "findings|no finding|unchanged|residual"]
+  ],
+  "C5": [
+    ["same controlled conditions", "approach", "same|identical|control"],
+    ["warmup and repetition", "evidence", "warmup|repeat|multiple trial"],
+    ["raw measurements", "evidence", "raw|per.trial|sample"],
+    ["variance or uncertainty", "evidence", "variance|uncert|confidence|noise"],
+    ["correctness protected", "evidence", "correct|acceptable|error"],
+    ["shared hardware serialized", "agents", "no|shared|serial|same.*environment"]
+  ],
+  "C6": [
+    ["large coordinated scope", "approach", "large|cross.module|contract|phase"],
+    ["producer-consumer map", "evidence", "producer|consumer|planner|transport|kernel|backend"],
+    ["durable design or plan", "artifacts", "design|plan|roadmap"],
+    ["contract decisions centralized", "agents", "central|sequential|contract|interface"],
+    ["phased verification", "evidence", "phase|integration|backend|compatib"],
+    ["stop on cross-system verification", "stop_conditions", "all.*backend|integration|contract|verified"]
+  ],
+  "C7": [
+    ["investigation objective", "objective", "investig|explain|trace|understand"],
+    ["no edits", "approach", "read.only|no.*edit|without.*chang"],
+    ["code-path evidence", "evidence", "code|call|symbol|state|path"],
+    ["uncertainty separated", "evidence", "unknown|uncertain|inference|unresolved"],
+    ["no forced artifact", "artifacts", "^\\[\\]$|none|only if"],
+    ["stop with bounded unknowns", "stop_conditions", "answer|unknown|unresolved|evidence"]
+  ],
+  "C8": [
+    ["test first", "objective", "test|check|acceptance|valid"],
+    ["conditional debug", "transitions", "if.*fail.*debug|fail.*unknown.*debug|debug.*only"],
+    ["proof before repair", "transitions", "prove|proof|confirmed|root cause"],
+    ["return to testing", "transitions", "test|rerun|validation|authoritative"],
+    ["stop on pass or block", "stop_conditions", "pass|blocked|unavailable"],
+    ["no speculative fix", "approach", "no.*speculat|only.*proven|do not.*fix|before.*repair"]
+  ]
+}

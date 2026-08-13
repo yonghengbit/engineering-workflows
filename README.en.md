@@ -145,6 +145,17 @@ This is not a claim of general coding superiority. See `tests/evals/` for the fr
 JSONL, scorer, exploratory run, and limitations; the host did not expose a verifiable public model
 slug.
 
+A new three-way planning comparison covers the native agent, Engineering Workflows, and Superpowers
+v6.1.1. On the same frozen 48-check rubric, this project scored **39/48 (81.2%)** versus Superpowers at
+36/48 (75.0%), with 57.3% less loaded-input proxy and 52.4% less combined input/output proxy. The
+native agent was cheapest but scored 30/48 (62.5%). These are single-run, planning-only character
+proxies—not billed tokens or coding success rates. See the [full comparative report](tests/evals/comparative/report.md)
+and raw JSONL.
+
+![Three-way planning quality comparison](assets/benchmark-planning-quality.svg)
+
+![Three-way token proxy comparison](assets/benchmark-token-proxy.svg)
+
 ## Layout
 
 ```text

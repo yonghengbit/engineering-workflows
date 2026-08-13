@@ -1,0 +1,14 @@
+{
+  "engineering-workflow": {
+    "repository": "https://github.com/yonghengbit/engineering-workflows",
+    "commit": "616fe61c306218cbff67bd0474f09151e96c3867",
+    "entrypoint": "skills/engineering-workflow/SKILL.md"
+  },
+  "superpowers": {
+    "repository": "https://github.com/obra/superpowers",
+    "release": "v6.1.1",
+    "commit": "d884ae04edebef577e82ff7c4e143debd0bbec99",
+    "entrypoint": "skills/using-superpowers/SKILL.md",
+    "entrypoint_sha256": "55379FE7C1C473A02C61961C822996BFF30E1320D6921D9062509BC508482C05"
+  }
+}

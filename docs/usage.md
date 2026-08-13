@@ -436,3 +436,22 @@ holdout 仍只有 8 个案例、不执行真实代码，而且 regex scorer 对�
 本 skill 在这组 prompts 上改善了 routing 和 evidence discipline，不能宣传为“编码成功率提高
 16.7%”。它也不证明成本、延迟、Claude Code 或其他模型/宿主上的收益。原始 JSONL、冻结
 协议、rubric 和 scorer 全部保留，可复查和扩展。
+
+### 三方规划与上下文成本对照
+
+2026-08-13 的 comparative benchmark 使用 8 个相同 planning-only prompt，对比 Native Agent、
+本 skill 和 Superpowers v6.1.1：
+
+| 条件 | 规划检查 | 加载输入代理 | 输出代理 | 合计代理 |
+|---|---:|---:|---:|---:|
+| Native Agent | 30/48（62.5%） | 0 | 2,751 | 2,751 |
+| Engineering Workflows | **39/48（81.2%）** | **6,552** | **2,851** | **9,403** |
+| Superpowers v6.1.1 | 36/48（75.0%） | 15,338 | 4,428 | 19,766 |
+
+相对 Superpowers，本 skill 在这次运行中多通过 3 个检查点，同时加载输入代理少 57.3%、合计
+代理少 52.4%。Native Agent 仍然最省，因此结论不是“所有任务都应调用 skill”，而是：当任务
+需要 routing、授权边界或证据纪律时，本 skill 在这组测试中提供了更好的质量/上下文折中。
+
+这里的 token 数是 `ceil(规范化字符数 / 4)`，不是宿主实际计费 token。测试没有执行真实代码，
+每组只运行一次，regex 评分也会受措辞影响。完整协议、冻结 rubric、竞品 commit、加载文件
+hash、原始结果和限制见 [`tests/evals/comparative/report.md`](../tests/evals/comparative/report.md)。

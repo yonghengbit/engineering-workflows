@@ -1,0 +1,18 @@
+{
+  "source": "https://github.com/obra/superpowers",
+  "release": "v6.1.1",
+  "commit": "d884ae04edebef577e82ff7c4e143debd0bbec99",
+  "normalization": "UTF-8 text with CRLF replaced by LF; character count after normalization",
+  "files": {
+    "brainstorming/SKILL.md": {"characters": 10393, "sha256": "e14914605f640e0841758e45d0ab2a53243b59b921f929e47921c99668f2e61d"},
+    "dispatching-parallel-agents/SKILL.md": {"characters": 6618, "sha256": "f0df13f584049059cc5619f90061405b89dcc6e28ab3f2a8517d27d99c7a46a6"},
+    "systematic-debugging/condition-based-waiting.md": {"characters": 3498, "sha256": "e89fec8400d6cd50f43407cec9fab50976ba4d55d0ec2eb51c0bd68036b54c26"},
+    "systematic-debugging/root-cause-tracing.md": {"characters": 5308, "sha256": "6b0622269e098ca1399e123e553fd385f0b6412d88ef0e9c4f5a8ea9cf1cec7b"},
+    "systematic-debugging/SKILL.md": {"characters": 9861, "sha256": "3b20719eca4f0461cb51a195221320d775dcf03b6859271066a03a5132a6ce7a"},
+    "test-driven-development/SKILL.md": {"characters": 9884, "sha256": "b5b4717b8b761cce15a6cfe9022e33fd959e0894c0c39d72c9cb49c23486c10e"},
+    "using-superpowers/references/codex-tools.md": {"characters": 1520, "sha256": "9310bb2315eed2c1cebea02cd1c9e8fe121cb788fc6b41e8b8f8b5ff46f85f37"},
+    "using-superpowers/SKILL.md": {"characters": 3051, "sha256": "55379fe7c1c473a02c61961c822996bff30e1320d6921d9062509bc508482c05"},
+    "verification-before-completion/SKILL.md": {"characters": 4149, "sha256": "ea52d15aabaf72bc6b558efe2c126f161b53961090ddcd712000273bfe8c7b6c"},
+    "writing-plans/SKILL.md": {"characters": 7070, "sha256": "272e1af349f5062c28dc282b3e21b220d58d683a7314a10c455b7432ec91d845"}
+  }
+}
